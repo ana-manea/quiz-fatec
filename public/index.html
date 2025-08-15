@@ -1392,5 +1392,29 @@
             showNotification('⚠️ ERRO DE PROMESSA! VERIFIQUE O CONSOLE!', 'error');
         });
     </script>
+
+<script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+<script>
+    // Detecta se está em produção (Render) ou local
+    const SERVER_URL = window.location.hostname.includes("onrender.com")
+        ? "https://quiz-fatec.onrender.com"
+        : "http://localhost:3000";
+
+    // Conecta ao servidor Socket.IO
+    const socket = io(SERVER_URL, {
+        transports: ["websocket"], // Força uso de WebSocket
+        reconnectionAttempts: 5,   // Tenta reconectar até 5 vezes
+        reconnectionDelay: 1000    // Espera 1s entre tentativas
+    });
+
+    socket.on("connect", () => {
+        console.log("✅ Conectado ao servidor!", socket.id);
+    });
+
+    socket.on("connect_error", (err) => {
+        console.error("❌ Erro de conexão:", err.message);
+    });
+</script>
+
 </body>
 </html>
