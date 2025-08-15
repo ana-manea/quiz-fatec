@@ -326,7 +326,7 @@
             font-size: 0.8rem;
         }
 
-        .submit-btn {
+        .submit-btn, .admin-btn {
             font-family: 'Orbitron', monospace;
             background: linear-gradient(45deg, var(--neon-red), var(--neon-pink));
             color: var(--text-primary);
@@ -345,12 +345,27 @@
             overflow: hidden;
         }
 
-        .submit-btn:hover:not(:disabled) {
+        .admin-btn {
+            width: auto;
+            margin: 0.5rem 0.5rem 0 0;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        .admin-btn.danger {
+            background: linear-gradient(45deg, #ff4000, #ff0000);
+        }
+
+        .admin-btn.info {
+            background: linear-gradient(45deg, #0080ff, #0040ff);
+        }
+
+        .submit-btn:hover:not(:disabled), .admin-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 30px var(--neon-red-glow);
         }
 
-        .submit-btn:disabled {
+        .submit-btn:disabled, .admin-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
@@ -496,7 +511,7 @@
             z-index: 999;
         }
 
-        .admin-panel input, .admin-panel textarea {
+        .admin-panel input {
             width: 100%;
             padding: 12px 16px;
             border: 2px solid rgba(255, 0, 64, 0.5);
@@ -508,7 +523,7 @@
             transition: all 0.3s ease;
         }
 
-        .admin-panel input:focus, .admin-panel textarea:focus {
+        .admin-panel input:focus {
             outline: none;
             border-color: var(--neon-red);
             box-shadow: 0 0 15px var(--neon-red-glow);
@@ -524,6 +539,50 @@
             color: var(--neon-red);
             font-size: 0.9rem;
             margin-bottom: 1rem;
+        }
+
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .admin-stat-card {
+            background: var(--darker-bg);
+            border: 1px solid var(--neon-red);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .admin-stat-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--neon-red);
+            text-shadow: 0 0 10px var(--neon-red-glow);
+        }
+
+        .admin-stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .admin-responses {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .admin-response-item {
+            background: var(--darker-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid;
+            transition: transform 0.3s ease;
         }
 
         @media (max-width: 768px) {
@@ -559,6 +618,10 @@
                 position: static;
                 margin-top: 1rem;
             }
+
+            .admin-stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -593,8 +656,8 @@
         </div>
 
         <div class="view-selector">
-            <button class="view-btn active" onclick="showView('student')">ÁREA ESTUDANTE</button>
-            <button class="view-btn" onclick="showView('admin')">ÁREA ADMIN</button>
+            <button class="view-btn active" data-view="student">ÁREA ESTUDANTE</button>
+            <button class="view-btn" data-view="admin">ÁREA ADMIN</button>
         </div>
 
         <!-- Área do Estudante -->
@@ -687,7 +750,7 @@
                     Suas respostas foram sincronizadas com o servidor.
                 </div>
 
-                <button type="button" class="submit-btn" style="margin-top: 2rem; background: linear-gradient(45deg, var(--neon-cyan), #0080ff);">
+                <button type="button" class="submit-btn" id="new-quiz-btn" style="margin-top: 2rem; background: linear-gradient(45deg, var(--neon-cyan), #0080ff);">
                     🔄 NOVO QUIZ
                 </button>
             </div>
@@ -701,7 +764,7 @@
                     <div class="form-group">
                         <label for="admin-password">SENHA DE ACESSO:</label>
                         <input type="password" id="admin-password" placeholder="Digite a senha de admin">
-                        <button type="button" class="submit-btn" style="width: auto; margin: 1rem 0 0 0; padding: 10px 20px;">ACESSAR SISTEMA</button>
+                        <button type="button" class="admin-btn" id="admin-login-btn">ACESSAR SISTEMA</button>
                     </div>
                 </div>
 
@@ -709,30 +772,34 @@
                     <div style="background: var(--darker-bg); border: 1px solid var(--neon-red); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
                         <h3 style="margin-bottom: 1rem; color: var(--neon-red); text-transform: uppercase;">CONTROLE DE QUIZ - TEMPO REAL</h3>
                         <div style="margin-bottom: 1rem;">
-                            <button type="button" style="background: linear-gradient(45deg, #ff4000, #ff0000); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s ease; margin: 0.5rem 0.5rem 0 0;">REINICIAR QUIZ</button>
-                            <button type="button" style="background: linear-gradient(45deg, #0080ff, #0040ff); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s ease; margin: 0.5rem 0.5rem 0 0;">ATUALIZAR DADOS</button>
+                            <button type="button" class="admin-btn danger" id="admin-reset-btn">REINICIAR QUIZ</button>
+                            <button type="button" class="admin-btn info" id="admin-refresh-btn">ATUALIZAR DADOS</button>
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-                        <div style="background: var(--darker-bg); border: 1px solid var(--neon-red); padding: 1.5rem; border-radius: 12px; text-align: center;">
-                            <div style="font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: 700; color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red-glow);" id="total-responses">0</div>
-                            <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Squads Participantes</div>
+                    <div class="admin-stats-grid">
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="admin-total-responses">0</div>
+                            <div class="admin-stat-label">Respostas Totais</div>
                         </div>
-                        <div style="background: var(--darker-bg); border: 1px solid var(--neon-red); padding: 1.5rem; border-radius: 12px; text-align: center;">
-                            <div style="font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: 700; color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red-glow);" id="quiz-progress">0%</div>
-                            <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Taxa de Conclusão</div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="admin-unique-teams">0</div>
+                            <div class="admin-stat-label">Squads Participantes</div>
+                        </div>
+                        <div class="admin-stat-card">
+                            <div class="admin-stat-value" id="admin-quiz-progress">0%</div>
+                            <div class="admin-stat-label">Taxa de Conclusão</div>
                         </div>
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                         <h3 style="color: var(--neon-red); text-transform: uppercase;">RESULTADOS EM TEMPO REAL</h3>
-                        <div style="color: var(--neon-green); font-size: 0.9rem;" id="last-update">
+                        <div style="color: var(--neon-green); font-size: 0.9rem;" id="admin-last-update">
                             🟢 Dados sincronizados
                         </div>
                     </div>
                     
-                    <div id="responses-container" style="display: grid; gap: 1rem;">
+                    <div id="admin-responses-container" class="admin-responses">
                         <div style="text-align: center; color: var(--text-muted); padding: 2rem; font-family: 'JetBrains Mono', monospace;">
                             > Sistema aguardando participantes...
                         </div>
@@ -879,23 +946,54 @@
             updateDebugPanel();
             setInterval(updateDebugPanel, 1000);
             
+            // Event listeners para botões
+            setupEventListeners();
+            
             // Aguardar um pouco antes de tentar conectar
             setTimeout(() => {
                 initializeSocket();
             }, 1000);
             
             updateProgressBar();
-            
-            // Permitir Enter no campo de senha
-            const passwordField = document.getElementById('admin-password');
-            if (passwordField) {
-                passwordField.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        adminLogin();
-                    }
-                });
-            }
         });
+
+        function setupEventListeners() {
+            // View selector
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    showView(e.target.dataset.view);
+                });
+            });
+
+            // Team selection
+            document.querySelectorAll('.team-option').forEach(option => {
+                option.addEventListener('click', () => handleTeamSelection(option));
+            });
+
+            // Quiz controls
+            document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+            document.getElementById('student-form').addEventListener('submit', handleFormSubmit);
+            document.getElementById('new-quiz-btn').addEventListener('click', resetToStart);
+
+            // Admin controls
+            document.getElementById('admin-login-btn').addEventListener('click', adminLogin);
+            document.getElementById('admin-reset-btn').addEventListener('click', adminResetQuiz);
+            document.getElementById('admin-refresh-btn').addEventListener('click', refreshAdminData);
+
+            // Password field enter key
+            document.getElementById('admin-password').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    adminLogin();
+                }
+            });
+
+            // Option selection (delegated)
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.option') && currentScreen === "quiz-gameplay") {
+                    handleAnswerSelection(e.target.closest('.option'));
+                }
+            });
+        }
 
         // Inicializar Socket.IO
         function initializeSocket() {
@@ -908,6 +1006,8 @@
                     ? window.location.origin
                     : "http://localhost:3000";
                 
+                debugLog(`Conectando em: ${serverUrl}`);
+                
                 socket = io(serverUrl, {
                     timeout: 10000,
                     forceNew: true,
@@ -917,107 +1017,111 @@
                     transports: ['websocket', 'polling']
                 });
 
-                socket.on('connect', () => {
-                    debugLog('Conectado ao servidor!');
-                    isConnected = true;
-                    updateConnectionStatus();
-                    updateTerminalStatus('Sistema online... Aguardando participantes...');
-                    showNotification('🟢 CONECTADO AO SERVIDOR!', 'success');
-                });
-
-                socket.on('disconnect', (reason) => {
-                    debugLog(`Desconectado: ${reason}`);
-                    isConnected = false;
-                    updateConnectionStatus();
-                    updateTerminalStatus('Conexão perdida... Tentando reconectar...');
-                    showNotification('🔴 CONEXÃO PERDIDA!', 'error');
-                });
-
-                socket.on('connect_error', (error) => {
-                    debugLog(`Erro de conexão: ${error.message}`);
-                    isConnected = false;
-                    updateConnectionStatus();
-                    updateTerminalStatus('Erro de conexão... Verifique se o servidor está rodando...');
-                    showNotification('⚠️ ERRO DE CONEXÃO!', 'error');
-                });
-
-                socket.on('reconnect', (attemptNumber) => {
-                    debugLog(`Reconectado após ${attemptNumber} tentativa(s)`);
-                    showNotification('🟢 RECONECTADO!', 'success');
-                });
-
-                socket.on('quiz-status', (data) => {
-                    debugLog(`Status do quiz recebido: ${data.totalResponses} respostas`);
-                    updateProgressBar();
-                });
-
-                socket.on('answer-received', (data) => {
-                    debugLog(`Resposta confirmada: ${data.success}`);
-                    if (data.success) {
-                        showSuccessMessage();
-                        showNotification(data.message, 'success');
-                        
-                        setTimeout(() => {
-                            if (currentQuestionIndex < questions.length - 1) {
-                                currentQuestionIndex++;
-                                updateQuestionDisplay();
-                                resetQuestionSelection();
-                                showNotification('📢 PRÓXIMA MISSÃO ATIVADA!', 'info');
-                            } else {
-                                finishQuiz();
-                            }
-                        }, 2000);
-                    } else {
-                        showNotification('❌ ERRO AO ENVIAR RESPOSTA!', 'error');
-                    }
-                });
-
-                socket.on('quiz-completed', (data) => {
-                    debugLog(`Quiz concluído: ${data.percentage}%`);
-                    updateFinalScreenStats(data);
-                });
-
-                socket.on('quiz-reset', () => {
-                    debugLog('Quiz resetado pelo admin');
-                    if (!isAdmin) {
-                        resetToStart();
-                        showNotification('🔄 QUIZ REINICIADO PELO ADMIN!', 'info');
-                    }
-                });
-
-                // Events do admin
-                socket.on('admin-authenticated', (data) => {
-                    debugLog('Admin autenticado');
-                    isAdmin = true;
-                    document.getElementById('admin-login').style.display = 'none';
-                    document.getElementById('admin-content').style.display = 'block';
-                    updateAdminData(data);
-                    showNotification('✅ ACESSO ADMIN LIBERADO!', 'success');
-                });
-
-                socket.on('admin-error', (message) => {
-                    debugLog(`Erro admin: ${message}`);
-                    showNotification('❌ ' + message.toUpperCase(), 'error');
-                    document.getElementById('admin-password').value = '';
-                });
-
-                socket.on('admin-update', (data) => {
-                    if (isAdmin) {
-                        debugLog('Dados admin atualizados');
-                        updateAdminData(data);
-                    }
-                });
-
-                socket.on('error', (message) => {
-                    debugLog(`Erro: ${message}`);
-                    showNotification('⚠️ ' + message.toUpperCase(), 'error');
-                });
+                setupSocketEvents();
 
             } catch (error) {
                 debugLog(`Erro fatal na inicialização: ${error.message}`);
                 updateTerminalStatus('Erro fatal... Recarregue a página...');
                 showNotification('💀 ERRO FATAL! RECARREGUE A PÁGINA!', 'error');
             }
+        }
+
+        function setupSocketEvents() {
+            socket.on('connect', () => {
+                debugLog('Conectado ao servidor!');
+                isConnected = true;
+                updateConnectionStatus();
+                updateTerminalStatus('Sistema online... Aguardando participantes...');
+                showNotification('🟢 CONECTADO AO SERVIDOR!', 'success');
+            });
+
+            socket.on('disconnect', (reason) => {
+                debugLog(`Desconectado: ${reason}`);
+                isConnected = false;
+                updateConnectionStatus();
+                updateTerminalStatus('Conexão perdida... Tentando reconectar...');
+                showNotification('🔴 CONEXÃO PERDIDA!', 'error');
+            });
+
+            socket.on('connect_error', (error) => {
+                debugLog(`Erro de conexão: ${error.message}`);
+                isConnected = false;
+                updateConnectionStatus();
+                updateTerminalStatus('Erro de conexão... Verifique se o servidor está rodando...');
+                showNotification('⚠️ ERRO DE CONEXÃO!', 'error');
+            });
+
+            socket.on('reconnect', (attemptNumber) => {
+                debugLog(`Reconectado após ${attemptNumber} tentativa(s)`);
+                showNotification('🟢 RECONECTADO!', 'success');
+            });
+
+            socket.on('quiz-status', (data) => {
+                debugLog(`Status do quiz recebido: ${data.totalResponses} respostas`);
+                updateProgressBar();
+            });
+
+            socket.on('answer-received', (data) => {
+                debugLog(`Resposta confirmada: ${data.success}`);
+                if (data.success) {
+                    showSuccessMessage();
+                    showNotification(data.message, 'success');
+                    
+                    setTimeout(() => {
+                        if (currentQuestionIndex < questions.length - 1) {
+                            currentQuestionIndex++;
+                            updateQuestionDisplay();
+                            resetQuestionSelection();
+                            showNotification('📢 PRÓXIMA MISSÃO ATIVADA!', 'info');
+                        } else {
+                            finishQuiz();
+                        }
+                    }, 2000);
+                } else {
+                    showNotification('❌ ERRO AO ENVIAR RESPOSTA!', 'error');
+                }
+            });
+
+            socket.on('quiz-completed', (data) => {
+                debugLog(`Quiz concluído: ${data.percentage}%`);
+                updateFinalScreenStats(data);
+            });
+
+            socket.on('quiz-reset', () => {
+                debugLog('Quiz resetado pelo admin');
+                if (!isAdmin) {
+                    resetToStart();
+                    showNotification('🔄 QUIZ REINICIADO PELO ADMIN!', 'info');
+                }
+            });
+
+            // Events do admin
+            socket.on('admin-authenticated', (data) => {
+                debugLog('Admin autenticado com sucesso');
+                isAdmin = true;
+                document.getElementById('admin-login').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                updateAdminData(data);
+                showNotification('✅ ACESSO ADMIN LIBERADO!', 'success');
+            });
+
+            socket.on('admin-error', (message) => {
+                debugLog(`Erro admin: ${message}`);
+                showNotification('❌ ' + message.toUpperCase(), 'error');
+                document.getElementById('admin-password').value = '';
+            });
+
+            socket.on('admin-update', (data) => {
+                if (isAdmin) {
+                    debugLog('Dados admin atualizados');
+                    updateAdminData(data);
+                }
+            });
+
+            socket.on('error', (message) => {
+                debugLog(`Erro: ${message}`);
+                showNotification('⚠️ ' + message.toUpperCase(), 'error');
+            });
         }
 
         function updateTerminalStatus(message) {
@@ -1037,17 +1141,6 @@
                 statusEl.className = 'connection-status disconnected';
             }
         }
-
-        // Seleção de equipe e respostas
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.team-option')) {
-                handleTeamSelection(e.target.closest('.team-option'));
-            }
-
-            if (e.target.closest('.option') && currentScreen === "quiz-gameplay") {
-                handleAnswerSelection(e.target.closest('.option'));
-            }
-        });
 
         function handleTeamSelection(option) {
             if (!isConnected) {
@@ -1083,10 +1176,6 @@
             
             debugLog(`Resposta selecionada: ${selectedAnswer}`);
         }
-
-        // Event listeners
-        document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
-        document.getElementById('student-form').addEventListener('submit', handleFormSubmit);
 
         function startQuiz() {
             if (!selectedTeam || !isConnected) {
@@ -1284,7 +1373,7 @@
             });
             
             document.getElementById(viewName + '-view').classList.add('active');
-            event.target.classList.add('active');
+            document.querySelector(`[data-view="${viewName}"]`).classList.add('active');
         }
 
         // Funções do Admin
@@ -1305,20 +1394,24 @@
         }
 
         function updateAdminData(data) {
+            debugLog('Atualizando dados do admin');
+            
             if (data.stats) {
-                document.getElementById('total-responses').textContent = data.stats.totalResponses || 0;
-                document.getElementById('quiz-progress').textContent = `${data.stats.progressPercentage || 0}%`;
+                const stats = data.stats;
+                document.getElementById('admin-total-responses').textContent = stats.totalResponses || 0;
+                document.getElementById('admin-unique-teams').textContent = stats.uniqueTeams || 0;
+                document.getElementById('admin-quiz-progress').textContent = `${stats.progressPercentage || 0}%`;
             }
 
             if (data.responses) {
                 updateAdminResponses(data.responses);
             }
 
-            document.getElementById('last-update').textContent = '🟢 ' + new Date().toLocaleTimeString();
+            document.getElementById('admin-last-update').textContent = '🟢 Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
         }
 
         function updateAdminResponses(responses) {
-            const container = document.getElementById('responses-container');
+            const container = document.getElementById('admin-responses-container');
             
             if (!responses || responses.length === 0) {
                 container.innerHTML = `
@@ -1329,21 +1422,22 @@
                 return;
             }
 
+            // Mostrar as últimas 10 respostas
             const recentResponses = responses.slice(-10).reverse();
 
             container.innerHTML = recentResponses.map(response => {
-                const teamClass = response.teamId;
+                const teamClass = response.teamId || 'team-1';
                 const correctIcon = response.isCorrect ? '✅' : '❌';
                 const statusColor = response.isCorrect ? '#00ff80' : '#ff4040';
                 
                 return `
-                    <div style="background: var(--darker-bg); border-radius: 12px; padding: 1.5rem; border-left: 4px solid; border-left-color: ${getTeamColor(teamClass)}; position: relative; transition: transform 0.3s ease;">
+                    <div class="admin-response-item" style="border-left-color: ${getTeamColor(teamClass)};">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                             <span style="font-weight: bold; font-size: 1.1rem; color: var(--neon-red); text-transform: uppercase;">${response.team}</span>
                             <span style="color: var(--text-muted); font-size: 0.8rem;">${response.timestamp}</span>
                         </div>
                         <div style="margin-bottom: 0.5rem;">
-                            <strong>Missão ${response.questionIndex + 1}:</strong> ${response.question}
+                            <strong>Missão ${response.questionIndex + 1}:</strong> ${response.question.substring(0, 80)}${response.question.length > 80 ? '...' : ''}
                         </div>
                         <div style="margin-bottom: 0.5rem;">
                             <strong>Resposta:</strong> <span style="color: ${statusColor};">${response.answer} ${correctIcon}</span>
@@ -1367,22 +1461,6 @@
             };
             return colors[teamId] || '#ff0040';
         }
-
-        // Event listeners para admin (usando delegação de eventos para evitar erros)
-        document.addEventListener('click', function(e) {
-            if (e.target.textContent === 'ACESSAR SISTEMA') {
-                adminLogin();
-            }
-            if (e.target.textContent === 'REINICIAR QUIZ') {
-                adminResetQuiz();
-            }
-            if (e.target.textContent === 'ATUALIZAR DADOS') {
-                refreshAdminData();
-            }
-            if (e.target.textContent === '🔄 NOVO QUIZ') {
-                resetToStart();
-            }
-        });
 
         function adminResetQuiz() {
             if (!isConnected) {
