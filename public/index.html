@@ -378,139 +378,6 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .admin-panel input, .admin-panel textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid rgba(255, 0, 64, 0.5);
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: 'JetBrains Mono', monospace;
-            background: var(--darker-bg);
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-
-        .admin-panel input:focus, .admin-panel textarea:focus {
-            outline: none;
-            border-color: var(--neon-red);
-            box-shadow: 0 0 15px var(--neon-red-glow);
-        }
-
-        .password-section {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--darker-bg);
-            border: 1px solid var(--neon-red);
-            padding: 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-family: 'Orbitron', monospace;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--neon-red);
-            text-shadow: 0 0 10px var(--neon-red-glow);
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .responses-container {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .response-card {
-            background: var(--darker-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border-left: 4px solid;
-            position: relative;
-            transition: transform 0.3s ease;
-        }
-
-        .response-card.team-1 { border-left-color: #ff0040; }
-        .response-card.team-2 { border-left-color: #ff4000; }
-        .response-card.team-3 { border-left-color: #ff8000; }
-        .response-card.team-4 { border-left-color: #ffff00; }
-        .response-card.team-5 { border-left-color: #8000ff; }
-        .response-card.team-6 { border-left-color: #ff0080; }
-
-        .response-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .team-name {
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: var(--neon-red);
-            text-transform: uppercase;
-        }
-
-        .timestamp {
-            color: var(--text-muted);
-            font-size: 0.8rem;
-        }
-
-        .question-management {
-            background: var(--darker-bg);
-            border: 1px solid var(--neon-red);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .clear-btn, .next-question-btn {
-            background: linear-gradient(45deg, #ff4000, #ff0000);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            transition: all 0.3s ease;
-            margin: 0.5rem 0.5rem 0 0;
-        }
-
-        .next-question-btn {
-            background: linear-gradient(45deg, #00ff80, #008040);
-        }
-
-        .clear-btn:hover, .next-question-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 64, 0, 0.4);
-        }
-
-        .terminal-text {
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--neon-red);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
         .quiz-screen {
             display: none;
         }
@@ -616,6 +483,50 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
+        .debug-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--darker-bg);
+            border: 1px solid var(--neon-red);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            max-width: 300px;
+            z-index: 999;
+        }
+
+        .admin-panel input, .admin-panel textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(255, 0, 64, 0.5);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--darker-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .admin-panel input:focus, .admin-panel textarea:focus {
+            outline: none;
+            border-color: var(--neon-red);
+            box-shadow: 0 0 15px var(--neon-red-glow);
+        }
+
+        .password-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .terminal-text {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--neon-red);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 1rem;
@@ -644,6 +555,11 @@
                 margin-bottom: 1rem;
                 text-align: center;
             }
+
+            .debug-panel {
+                position: static;
+                margin-top: 1rem;
+            }
         }
     </style>
 </head>
@@ -652,11 +568,19 @@
         🔌 CONECTANDO...
     </div>
 
+    <!-- Debug Panel -->
+    <div class="debug-panel" id="debug-panel">
+        <strong>DEBUG:</strong><br>
+        Socket: <span id="socket-status">Desconectado</span><br>
+        Estado: <span id="current-state">Inicial</span><br>
+        Time: <span id="debug-time">--:--</span>
+    </div>
+
     <div class="container">
         <div class="header">
             <div class="logo">CYBERQUIZ FATEC</div>
             <div class="subtitle">SISTEMA MULTIPLAYER - TEMPO REAL</div>
-            <div class="terminal-text">> Sistema online... Aguardando participantes...</div>
+            <div class="terminal-text" id="terminal-status">> Sistema inicializando... Conectando ao servidor...</div>
         </div>
 
         <div class="progress-container">
@@ -783,27 +707,22 @@
                 </div>
 
                 <div id="admin-content" style="display: none;">
-                    <div class="question-management">
+                    <div style="background: var(--darker-bg); border: 1px solid var(--neon-red); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
                         <h3 style="margin-bottom: 1rem; color: var(--neon-red); text-transform: uppercase;">CONTROLE DE QUIZ - TEMPO REAL</h3>
                         <div style="margin-bottom: 1rem;">
-                            <button type="button" onclick="adminResetQuiz()" class="clear-btn">REINICIAR QUIZ</button>
-                            <button type="button" onclick="generateFinalReport()" class="next-question-btn">RELATÓRIO FINAL</button>
-                            <button type="button" onclick="refreshAdminData()" class="next-question-btn" style="background: linear-gradient(45deg, #0080ff, #0040ff);">ATUALIZAR DADOS</button>
+                            <button type="button" onclick="adminResetQuiz()" style="background: linear-gradient(45deg, #ff4000, #ff0000); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s ease; margin: 0.5rem 0.5rem 0 0;">REINICIAR QUIZ</button>
+                            <button type="button" onclick="refreshAdminData()" style="background: linear-gradient(45deg, #0080ff, #0040ff); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s ease; margin: 0.5rem 0.5rem 0 0;">ATUALIZAR DADOS</button>
                         </div>
                     </div>
 
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number" id="total-responses">0</div>
-                            <div class="stat-label">Respostas Totais</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: var(--darker-bg); border: 1px solid var(--neon-red); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                            <div style="font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: 700; color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red-glow);" id="total-responses">0</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Squads Participantes</div>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="teams-responded">0</div>
-                            <div class="stat-label">Squads Participantes</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number" id="quiz-progress">0%</div>
-                            <div class="stat-label">Taxa de Conclusão</div>
+                        <div style="background: var(--darker-bg); border: 1px solid var(--neon-red); padding: 1.5rem; border-radius: 12px; text-align: center;">
+                            <div style="font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: 700; color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red-glow);" id="quiz-progress">0%</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Taxa de Conclusão</div>
                         </div>
                     </div>
 
@@ -814,7 +733,7 @@
                         </div>
                     </div>
                     
-                    <div id="responses-container" class="responses-container">
+                    <div id="responses-container" style="display: grid; gap: 1rem;">
                         <div style="text-align: center; color: var(--text-muted); padding: 2rem; font-family: 'JetBrains Mono', monospace;">
                             > Sistema aguardando participantes...
                         </div>
@@ -841,7 +760,7 @@
                 question: "Em que ano foi criada a primeira FATEC?",
                 options: [
                     "1968",
-                    "1969",
+                    "1969", 
                     "1970",
                     "1971"
                 ],
@@ -940,10 +859,30 @@
         let isConnected = false;
         let isAdmin = false;
 
+        // Debug functions
+        function updateDebugPanel() {
+            const now = new Date();
+            document.getElementById('debug-time').textContent = now.toLocaleTimeString('pt-BR');
+            document.getElementById('socket-status').textContent = isConnected ? 'Conectado' : 'Desconectado';
+            document.getElementById('current-state').textContent = currentScreen;
+        }
+
+        function debugLog(message) {
+            console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
+            updateDebugPanel();
+        }
+
         // Inicialização do sistema
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Inicializando CyberQuiz FATEC...');
-            initializeSocket();
+            debugLog('Inicializando CyberQuiz FATEC...');
+            updateDebugPanel();
+            setInterval(updateDebugPanel, 1000);
+            
+            // Aguardar um pouco antes de tentar conectar
+            setTimeout(() => {
+                initializeSocket();
+            }, 1000);
+            
             updateProgressBar();
             
             // Permitir Enter no campo de senha
@@ -959,88 +898,127 @@
 
         // Inicializar Socket.IO
         function initializeSocket() {
-            console.log('Conectando ao servidor...');
-            socket = io();
+            debugLog('Tentando conectar ao servidor...');
+            updateTerminalStatus('Conectando ao servidor...');
+            
+            try {
+                socket = io({
+                    timeout: 10000,
+                    forceNew: true,
+                    reconnection: true,
+                    reconnectionDelay: 1000,
+                    reconnectionAttempts: 5,
+                    transports: ['websocket', 'polling']
+                });
 
-            socket.on('connect', () => {
-                console.log('Conectado ao servidor!');
-                isConnected = true;
-                updateConnectionStatus();
-                showNotification('🟢 CONECTADO AO SERVIDOR!', 'success');
-            });
+                socket.on('connect', () => {
+                    debugLog('Conectado ao servidor!');
+                    isConnected = true;
+                    updateConnectionStatus();
+                    updateTerminalStatus('Sistema online... Aguardando participantes...');
+                    showNotification('🟢 CONECTADO AO SERVIDOR!', 'success');
+                });
 
-            socket.on('disconnect', () => {
-                console.log('Desconectado do servidor!');
-                isConnected = false;
-                updateConnectionStatus();
-                showNotification('🔴 CONEXÃO PERDIDA!', 'error');
-            });
+                socket.on('disconnect', (reason) => {
+                    debugLog(`Desconectado: ${reason}`);
+                    isConnected = false;
+                    updateConnectionStatus();
+                    updateTerminalStatus('Conexão perdida... Tentando reconectar...');
+                    showNotification('🔴 CONEXÃO PERDIDA!', 'error');
+                });
 
-            socket.on('connect_error', (error) => {
-                console.error('Erro de conexão:', error);
-                isConnected = false;
-                updateConnectionStatus();
-                showNotification('⚠️ ERRO DE CONEXÃO!', 'error');
-            });
+                socket.on('connect_error', (error) => {
+                    debugLog(`Erro de conexão: ${error.message}`);
+                    isConnected = false;
+                    updateConnectionStatus();
+                    updateTerminalStatus('Erro de conexão... Verifique se o servidor está rodando...');
+                    showNotification('⚠️ ERRO DE CONEXÃO!', 'error');
+                });
 
-            socket.on('quiz-status', (data) => {
-                updateProgressBar();
-            });
+                socket.on('reconnect', (attemptNumber) => {
+                    debugLog(`Reconectado após ${attemptNumber} tentativa(s)`);
+                    showNotification('🟢 RECONECTADO!', 'success');
+                });
 
-            socket.on('answer-received', (data) => {
-                if (data.success) {
-                    showSuccessMessage();
-                    showNotification(data.message, 'success');
-                    
-                    setTimeout(() => {
-                        if (currentQuestionIndex < questions.length - 1) {
-                            currentQuestionIndex++;
-                            updateQuestionDisplay();
-                            resetQuestionSelection();
-                            showNotification('📢 PRÓXIMA MISSÃO ATIVADA!', 'info');
-                        } else {
-                            finishQuiz();
-                        }
-                    }, 2000);
-                } else {
-                    showNotification('❌ ERRO AO ENVIAR RESPOSTA!', 'error');
-                }
-            });
+                socket.on('quiz-status', (data) => {
+                    debugLog(`Status do quiz recebido: ${data.totalResponses} respostas`);
+                    updateProgressBar();
+                });
 
-            socket.on('quiz-completed', (data) => {
-                updateFinalScreenStats(data);
-            });
+                socket.on('answer-received', (data) => {
+                    debugLog(`Resposta confirmada: ${data.success}`);
+                    if (data.success) {
+                        showSuccessMessage();
+                        showNotification(data.message, 'success');
+                        
+                        setTimeout(() => {
+                            if (currentQuestionIndex < questions.length - 1) {
+                                currentQuestionIndex++;
+                                updateQuestionDisplay();
+                                resetQuestionSelection();
+                                showNotification('📢 PRÓXIMA MISSÃO ATIVADA!', 'info');
+                            } else {
+                                finishQuiz();
+                            }
+                        }, 2000);
+                    } else {
+                        showNotification('❌ ERRO AO ENVIAR RESPOSTA!', 'error');
+                    }
+                });
 
-            socket.on('quiz-reset', () => {
-                if (!isAdmin) {
-                    resetToStart();
-                    showNotification('🔄 QUIZ REINICIADO PELO ADMIN!', 'info');
-                }
-            });
+                socket.on('quiz-completed', (data) => {
+                    debugLog(`Quiz concluído: ${data.percentage}%`);
+                    updateFinalScreenStats(data);
+                });
 
-            // Events do admin
-            socket.on('admin-authenticated', (data) => {
-                isAdmin = true;
-                document.getElementById('admin-login').style.display = 'none';
-                document.getElementById('admin-content').style.display = 'block';
-                updateAdminData(data);
-                showNotification('✅ ACESSO ADMIN LIBERADO!', 'success');
-            });
+                socket.on('quiz-reset', () => {
+                    debugLog('Quiz resetado pelo admin');
+                    if (!isAdmin) {
+                        resetToStart();
+                        showNotification('🔄 QUIZ REINICIADO PELO ADMIN!', 'info');
+                    }
+                });
 
-            socket.on('admin-error', (message) => {
-                showNotification('❌ ' + message.toUpperCase(), 'error');
-                document.getElementById('admin-password').value = '';
-            });
-
-            socket.on('admin-update', (data) => {
-                if (isAdmin) {
+                // Events do admin
+                socket.on('admin-authenticated', (data) => {
+                    debugLog('Admin autenticado');
+                    isAdmin = true;
+                    document.getElementById('admin-login').style.display = 'none';
+                    document.getElementById('admin-content').style.display = 'block';
                     updateAdminData(data);
-                }
-            });
+                    showNotification('✅ ACESSO ADMIN LIBERADO!', 'success');
+                });
 
-            socket.on('error', (message) => {
-                showNotification('⚠️ ' + message.toUpperCase(), 'error');
-            });
+                socket.on('admin-error', (message) => {
+                    debugLog(`Erro admin: ${message}`);
+                    showNotification('❌ ' + message.toUpperCase(), 'error');
+                    document.getElementById('admin-password').value = '';
+                });
+
+                socket.on('admin-update', (data) => {
+                    if (isAdmin) {
+                        debugLog('Dados admin atualizados');
+                        updateAdminData(data);
+                    }
+                });
+
+                socket.on('error', (message) => {
+                    debugLog(`Erro: ${message}`);
+                    showNotification('⚠️ ' + message.toUpperCase(), 'error');
+                });
+
+            } catch (error) {
+                debugLog(`Erro fatal na inicialização: ${error.message}`);
+                updateTerminalStatus('Erro fatal... Recarregue a página...');
+                showNotification('💀 ERRO FATAL! RECARREGUE A PÁGINA!', 'error');
+            }
+        }
+
+        function updateTerminalStatus(message) {
+            const terminalEl = document.getElementById('terminal-status');
+            if (terminalEl) {
+                terminalEl.textContent = `> ${message}`;
+            }
         }
 
         function updateConnectionStatus() {
@@ -1074,6 +1052,7 @@
                 
                 document.getElementById('start-quiz-btn').disabled = false;
                 
+                debugLog(`Squad selecionada: ${selectedTeam}`);
                 showNotification('✅ SQUAD SELECIONADA!', 'success');
                 
                 if (navigator.vibrate) {
@@ -1091,6 +1070,8 @@
                 
                 option.classList.add('selected');
                 selectedAnswer = option.dataset.value;
+                
+                debugLog(`Resposta selecionada: ${selectedAnswer}`);
             }
         });
 
@@ -1099,6 +1080,8 @@
                 showNotification('⚠️ SELECIONE UMA SQUAD E CONECTE-SE!', 'error');
                 return;
             }
+            
+            debugLog(`Iniciando quiz para ${selectedTeam}`);
             
             quizStartTime = new Date();
             currentScreen = "quiz-gameplay";
@@ -1109,6 +1092,7 @@
             currentQuestionIndex = 0;
             updateQuestionDisplay();
             
+            updateTerminalStatus(`Quiz iniciado para ${selectedTeam}`);
             showNotification('🚀 QUIZ INICIADO! BOA SORTE!', 'info');
         }
 
@@ -1137,19 +1121,26 @@
                 correctAnswer: currentQuestion.correct
             };
 
+            debugLog(`Enviando resposta: ${selectedAnswer} para questão ${currentQuestionIndex + 1}`);
+            
             socket.emit('submit-answer', responseData);
 
             // Animação de envio
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
-            submitBtn.style.transform = 'scale(0.95)';
+            submitBtn.textContent = 'ENVIANDO...';
+            
             setTimeout(() => {
-                submitBtn.style.transform = '';
-                submitBtn.disabled = false;
+                submitBtn.textContent = 'TRANSMITIR RESPOSTA';
+                if (!submitBtn.disabled) {
+                    submitBtn.disabled = false;
+                }
             }, 2000);
         });
 
         function finishQuiz() {
+            debugLog('Finalizando quiz');
+            
             currentScreen = "final-screen";
             
             document.getElementById('progress-bar').style.width = '100%';
@@ -1167,15 +1158,19 @@
             // Solicitar dados finais do servidor
             socket.emit('finish-quiz', { team: selectedTeam });
             
+            updateTerminalStatus('Quiz finalizado!');
             showNotification('🎉 PARABÉNS! QUIZ FINALIZADO!', 'success');
         }
 
         function updateFinalScreenStats(data) {
+            debugLog(`Stats finais: ${data.totalCorrect}/${data.totalQuestions} (${data.percentage}%)`);
             document.getElementById('final-correct').textContent = `${data.totalCorrect}/${data.totalQuestions}`;
             document.getElementById('final-percentage').textContent = `${data.percentage}%`;
         }
 
         function resetToStart() {
+            debugLog('Resetando para o início');
+            
             currentQuestionIndex = 0;
             selectedAnswer = "";
             selectedTeam = "";
@@ -1195,6 +1190,7 @@
             document.getElementById('start-quiz-btn').disabled = true;
             
             updateProgressBar();
+            updateTerminalStatus('Sistema reiniciado...');
             
             showNotification('🔄 SISTEMA REINICIADO!', 'info');
         }
@@ -1204,6 +1200,10 @@
                 opt.classList.remove('selected');
             });
             selectedAnswer = "";
+            
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'TRANSMITIR RESPOSTA';
         }
 
         function showNotification(message, type = 'info') {
@@ -1233,6 +1233,8 @@
         function updateQuestionDisplay() {
             const currentQuestion = questions[currentQuestionIndex];
             const questionNumber = currentQuestionIndex + 1;
+            
+            debugLog(`Exibindo questão ${questionNumber}: ${currentQuestion.question.substring(0, 50)}...`);
             
             document.getElementById('question-number').textContent = `MISSÃO ${questionNumber} DE ${questions.length}`;
             document.getElementById('question-text').textContent = currentQuestion.question;
@@ -1280,6 +1282,13 @@
                 showNotification('⚠️ DIGITE A SENHA!', 'error');
                 return;
             }
+            
+            if (!isConnected) {
+                showNotification('❌ SEM CONEXÃO COM SERVIDOR!', 'error');
+                return;
+            }
+            
+            debugLog('Tentando login admin');
             socket.emit('admin-login', { password: password });
         }
 
@@ -1317,10 +1326,10 @@
                 const statusColor = response.isCorrect ? '#00ff80' : '#ff4040';
                 
                 return `
-                    <div class="response-card ${teamClass}">
-                        <div class="response-header">
-                            <span class="team-name">${response.team}</span>
-                            <span class="timestamp">${response.timestamp}</span>
+                    <div style="background: var(--darker-bg); border-radius: 12px; padding: 1.5rem; border-left: 4px solid; border-left-color: ${getTeamColor(teamClass)}; position: relative; transition: transform 0.3s ease;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <span style="font-weight: bold; font-size: 1.1rem; color: var(--neon-red); text-transform: uppercase;">${response.team}</span>
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">${response.timestamp}</span>
                         </div>
                         <div style="margin-bottom: 0.5rem;">
                             <strong>Missão ${response.questionIndex + 1}:</strong> ${response.question}
@@ -1336,94 +1345,52 @@
             }).join('');
         }
 
-        function generateFinalReport() {
-            // Fazer requisição para obter dados completos
-            fetch('/api/admin/responses', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    password: 'fatec2024'
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.responses) {
-                    const report = generateReportText(data.responses);
-                    downloadReport(report);
-                    showNotification('📊 RELATÓRIO GERADO!', 'success');
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao gerar relatório:', error);
-                showNotification('❌ ERRO AO GERAR RELATÓRIO!', 'error');
-            });
-        }
-
-        function generateReportText(responses) {
-            const report = [];
-            report.push('='.repeat(60));
-            report.push('          RELATÓRIO FINAL - CYBERQUIZ FATEC');
-            report.push('='.repeat(60));
-            report.push(`Data: ${new Date().toLocaleDateString('pt-BR')}`);
-            report.push(`Hora: ${new Date().toLocaleTimeString('pt-BR')}`);
-            report.push('');
-            
-            // Estatísticas gerais
-            const totalResponses = responses.length;
-            const uniqueTeams = [...new Set(responses.map(r => r.team))];
-            const correctAnswers = responses.filter(r => r.isCorrect).length;
-            
-            report.push('ESTATÍSTICAS GERAIS:');
-            report.push('-'.repeat(30));
-            report.push(`Total de respostas: ${totalResponses}`);
-            report.push(`Squads participantes: ${uniqueTeams.length}`);
-            report.push(`Respostas corretas: ${correctAnswers} (${Math.round((correctAnswers/totalResponses)*100)}%)`);
-            report.push('');
-            
-            // Resultados por squad
-            report.push('RESULTADOS POR SQUAD:');
-            report.push('-'.repeat(30));
-            
-            uniqueTeams.forEach(team => {
-                const teamResponses = responses.filter(r => r.team === team);
-                const teamCorrect = teamResponses.filter(r => r.isCorrect).length;
-                const teamPercentage = Math.round((teamCorrect / teamResponses.length) * 100);
-                
-                report.push(`${team}:`);
-                report.push(`  Respostas: ${teamResponses.length}`);
-                report.push(`  Corretas: ${teamCorrect} (${teamPercentage}%)`);
-                report.push('');
-            });
-            
-            return report.join('\n');
-        }
-
-        function downloadReport(content) {
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `cyberquiz-fatec-${new Date().toISOString().split('T')[0]}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+        function getTeamColor(teamId) {
+            const colors = {
+                'team-1': '#ff0040',
+                'team-2': '#ff4000', 
+                'team-3': '#ff8000',
+                'team-4': '#ffff00',
+                'team-5': '#8000ff',
+                'team-6': '#ff0080'
+            };
+            return colors[teamId] || '#ff0040';
         }
 
         function adminResetQuiz() {
+            if (!isConnected) {
+                showNotification('❌ SEM CONEXÃO COM SERVIDOR!', 'error');
+                return;
+            }
+            
             if (confirm('Tem certeza que deseja reiniciar o quiz? Todos os dados serão perdidos!')) {
+                debugLog('Admin resetando quiz');
                 socket.emit('admin-reset', { password: 'fatec2024' });
                 showNotification('🔄 QUIZ REINICIADO!', 'info');
             }
         }
 
         function refreshAdminData() {
+            if (!isConnected) {
+                showNotification('❌ SEM CONEXÃO COM SERVIDOR!', 'error');
+                return;
+            }
+            
+            debugLog('Atualizando dados admin');
             socket.emit('admin-refresh', { password: 'fatec2024' });
             showNotification('🔄 DADOS ATUALIZADOS!', 'info');
         }
+
+        // Tratamento de erros globais
+        window.addEventListener('error', (e) => {
+            debugLog(`Erro JS: ${e.message}`);
+            showNotification('⚠️ ERRO DETECTADO! VERIFIQUE O CONSOLE!', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', (e) => {
+            debugLog(`Promise rejeitada: ${e.reason}`);
+            showNotification('⚠️ ERRO DE PROMESSA! VERIFIQUE O CONSOLE!', 'error');
+        });
     </script>
 </body>
 </html>
