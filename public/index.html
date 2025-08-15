@@ -942,6 +942,7 @@
 
         // Inicialização do sistema
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Inicializando CyberQuiz FATEC...');
             initializeSocket();
             updateProgressBar();
             
@@ -958,22 +959,31 @@
 
         // Inicializar Socket.IO
         function initializeSocket() {
+            console.log('Conectando ao servidor...');
             socket = io();
 
             socket.on('connect', () => {
+                console.log('Conectado ao servidor!');
                 isConnected = true;
                 updateConnectionStatus();
                 showNotification('🟢 CONECTADO AO SERVIDOR!', 'success');
             });
 
             socket.on('disconnect', () => {
+                console.log('Desconectado do servidor!');
                 isConnected = false;
                 updateConnectionStatus();
                 showNotification('🔴 CONEXÃO PERDIDA!', 'error');
             });
 
+            socket.on('connect_error', (error) => {
+                console.error('Erro de conexão:', error);
+                isConnected = false;
+                updateConnectionStatus();
+                showNotification('⚠️ ERRO DE CONEXÃO!', 'error');
+            });
+
             socket.on('quiz-status', (data) => {
-                // Atualizar status do quiz
                 updateProgressBar();
             });
 
@@ -987,7 +997,7 @@
                             currentQuestionIndex++;
                             updateQuestionDisplay();
                             resetQuestionSelection();
-                            showNotification('🔢 PRÓXIMA MISSÃO ATIVADA!', 'info');
+                            showNotification('📢 PRÓXIMA MISSÃO ATIVADA!', 'info');
                         } else {
                             finishQuiz();
                         }
@@ -1045,8 +1055,10 @@
         }
 
         // Seleção de equipe
-        document.querySelectorAll('.team-option').forEach(option => {
-            option.addEventListener('click', function() {
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.team-option')) {
+                const option = e.target.closest('.team-option');
+                
                 if (!isConnected) {
                     showNotification('❌ CONECTE-SE AO SERVIDOR PRIMEIRO!', 'error');
                     return;
@@ -1056,9 +1068,9 @@
                     opt.classList.remove('selected');
                 });
                 
-                this.classList.add('selected');
-                selectedTeam = this.dataset.team;
-                selectedTeamId = this.dataset.id;
+                option.classList.add('selected');
+                selectedTeam = option.dataset.team;
+                selectedTeamId = option.dataset.id;
                 
                 document.getElementById('start-quiz-btn').disabled = false;
                 
@@ -1067,7 +1079,19 @@
                 if (navigator.vibrate) {
                     navigator.vibrate(50);
                 }
-            });
+            }
+
+            // Seleção de resposta
+            if (e.target.closest('.option') && currentScreen === "quiz-gameplay") {
+                const option = e.target.closest('.option');
+                
+                document.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                option.classList.add('selected');
+                selectedAnswer = option.dataset.value;
+            }
         });
 
         function startQuiz() {
@@ -1087,20 +1111,6 @@
             
             showNotification('🚀 QUIZ INICIADO! BOA SORTE!', 'info');
         }
-
-        // Seleção de resposta
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.option') && currentScreen === "quiz-gameplay") {
-                const option = e.target.closest('.option');
-                
-                document.querySelectorAll('.option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                
-                option.classList.add('selected');
-                selectedAnswer = option.dataset.value;
-            }
-        });
 
         // Envio da resposta
         document.getElementById('student-form').addEventListener('submit', function(e) {
@@ -1266,6 +1276,10 @@
         // Funções do Admin
         function adminLogin() {
             const password = document.getElementById('admin-password').value;
+            if (!password) {
+                showNotification('⚠️ DIGITE A SENHA!', 'error');
+                return;
+            }
             socket.emit('admin-login', { password: password });
         }
 
@@ -1342,6 +1356,7 @@
                 }
             })
             .catch(error => {
+                console.error('Erro ao gerar relatório:', error);
                 showNotification('❌ ERRO AO GERAR RELATÓRIO!', 'error');
             });
         }
@@ -1395,6 +1410,7 @@
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
         }
 
         function adminResetQuiz() {
