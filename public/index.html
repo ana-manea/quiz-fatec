@@ -87,9 +87,20 @@
             animation: disconnectedPulse 1s ease-in-out infinite alternate;
         }
 
+        .connection-indicator.connecting {
+            background: linear-gradient(90deg, #ffaa00, #ff6600);
+            box-shadow: 0 0 10px #ffaa00;
+            animation: connectingPulse 0.8s ease-in-out infinite;
+        }
+
         @keyframes disconnectedPulse {
             from { opacity: 0.7; }
             to { opacity: 1; }
+        }
+
+        @keyframes connectingPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
         .header {
@@ -493,6 +504,12 @@
             color: #00ffff;
         }
 
+        .notification.warning {
+            background: var(--card-bg);
+            border: 2px solid #ffaa00;
+            color: #ffaa00;
+        }
+
         @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -865,6 +882,9 @@
         </div>
     </div>
     
+    <!-- Socket.io CDN -->
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    
     <script>
         // Base de dados das perguntas sobre FATEC
         const questions = [
@@ -981,24 +1001,168 @@
         let isConnected = false;
         let isAdmin = false;
         let responses = [];
-        let mockAdminPassword = 'fatec2024'; // Password para demonstração
+        let connectionRetryCount = 0;
+        const maxRetries = 5;
 
         // Inicialização do sistema
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Inicializando Quiz FATEC...');
-
-            // Simular conexão para demonstração
-            setTimeout(() => {
-                isConnected = true;
-                updateConnectionStatus();
-                updateTerminalStatus('Sistema online... Aguardando participantes...');
-                showNotification('🟢 SISTEMA INICIADO!', 'success');
-            }, 1000);
-            
-            // Event listeners para botões
+            console.log('🚀 Iniciando Quiz FATEC...');
+            initializeSocketConnection();
             setupEventListeners();
             updateProgressBar();
         });
+
+        function initializeSocketConnection() {
+            updateConnectionStatus('connecting');
+            updateTerminalStatus('Conectando ao servidor...');
+            
+            try {
+                // Conectar com Socket.io
+                socket = io(window.location.origin, {
+                    transports: ['websocket', 'polling'],
+                    timeout: 10000,
+                    reconnection: true,
+                    reconnectionAttempts: maxRetries,
+                    reconnectionDelay: 1000,
+                    forceNew: true
+                });
+
+                socket.on('connect', handleSocketConnect);
+                socket.on('disconnect', handleSocketDisconnect);
+                socket.on('connect_error', handleSocketError);
+                socket.on('reconnect', handleSocketReconnect);
+                socket.on('quiz-status', handleQuizStatus);
+                socket.on('answer-received', handleAnswerReceived);
+                socket.on('quiz-completed', handleQuizCompleted);
+                socket.on('admin-authenticated', handleAdminAuthenticated);
+                socket.on('admin-error', handleAdminError);
+                socket.on('admin-update', handleAdminUpdate);
+                socket.on('quiz-reset', handleQuizReset);
+
+            } catch (error) {
+                console.error('❌ Erro ao inicializar socket:', error);
+                handleConnectionFallback();
+            }
+        }
+
+        function handleSocketConnect() {
+            console.log('✅ Conectado ao servidor:', socket.id);
+            isConnected = true;
+            connectionRetryCount = 0;
+            updateConnectionStatus('connected');
+            updateTerminalStatus(`Conectado - ID: ${socket.id.substring(0, 8)}...`);
+            showNotification('🟢 CONECTADO AO SERVIDOR!', 'success');
+        }
+
+        function handleSocketDisconnect(reason) {
+            console.log('🔴 Desconectado:', reason);
+            isConnected = false;
+            updateConnectionStatus('disconnected');
+            updateTerminalStatus('Desconectado - Tentando reconectar...');
+            showNotification('🔴 CONEXÃO PERDIDA!', 'error');
+        }
+
+        function handleSocketError(error) {
+            console.error('❌ Erro de conexão:', error);
+            connectionRetryCount++;
+            
+            if (connectionRetryCount >= maxRetries) {
+                updateTerminalStatus('Falha na conexão - Modo offline ativado');
+                showNotification('⚠️ MODO OFFLINE ATIVO', 'warning');
+                handleConnectionFallback();
+            } else {
+                updateTerminalStatus(`Erro de conexão - Tentativa ${connectionRetryCount}/${maxRetries}`);
+            }
+        }
+
+        function handleSocketReconnect() {
+            console.log('🔄 Reconectado ao servidor');
+            showNotification('🟢 RECONECTADO!', 'success');
+        }
+
+        function handleConnectionFallback() {
+            // Fallback para modo offline/simulado
+            setTimeout(() => {
+                isConnected = true; // Simula conexão para demo
+                updateConnectionStatus('connected');
+                updateTerminalStatus('Modo demonstração ativo');
+                showNotification('⚠️ DEMO MODE - Funcionalidade limitada', 'warning');
+            }, 2000);
+        }
+
+        function handleQuizStatus(data) {
+            console.log('📊 Status do quiz recebido:', data);
+            updateProgressFromServer(data);
+        }
+
+        function handleAnswerReceived(data) {
+            console.log('✅ Confirmação de resposta:', data);
+            if (data.success) {
+                showNotification(data.message, 'success');
+            } else {
+                showNotification(data.message, 'error');
+            }
+        }
+
+        function handleQuizCompleted(data) {
+            console.log('🏆 Quiz completo:', data);
+            // Atualizar estatísticas finais se necessário
+        }
+
+        function handleAdminAuthenticated(data) {
+            console.log('👑 Admin autenticado:', data);
+            isAdmin = true;
+            
+            document.getElementById('admin-login').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+            
+            if (data.responses) {
+                responses = data.responses;
+            }
+            
+            updateAdminData();
+            showNotification('✅ ACESSO ADMIN LIBERADO!', 'success');
+            updateTerminalStatus('Admin conectado - Dados em tempo real');
+        }
+
+        function handleAdminError(message) {
+            console.log('❌ Erro admin:', message);
+            showNotification('❌ ' + message.toUpperCase(), 'error');
+            document.getElementById('admin-password').value = '';
+            document.getElementById('admin-password').focus();
+        }
+
+        function handleAdminUpdate(data) {
+            console.log('🔄 Atualização admin:', data);
+            if (isAdmin && data.responses) {
+                responses = data.responses;
+                updateAdminData();
+            }
+        }
+
+        function handleQuizReset() {
+            console.log('🔄 Quiz resetado pelo servidor');
+            resetToStart();
+            showNotification('🔄 QUIZ RESETADO!', 'info');
+        }
+
+        function updateProgressFromServer(data) {
+            if (data.totalQuestions) {
+                const serverProgress = Math.min((data.totalResponses || 0) / (6 * data.totalQuestions) * 100, 100);
+                // Atualizar apenas se necessário
+            }
+        }
+
+        function updateConnectionStatus(status = null) {
+            const statusEl = document.getElementById('connection-indicator');
+            if (status) {
+                statusEl.className = `connection-indicator ${status}`;
+            } else if (isConnected) {
+                statusEl.className = 'connection-indicator connected';
+            } else {
+                statusEl.className = 'connection-indicator disconnected';
+            }
+        }
 
         function setupEventListeners() {
             // View selector
@@ -1045,15 +1209,6 @@
             }
         }
 
-        function updateConnectionStatus() {
-            const statusEl = document.getElementById('connection-indicator');
-            if (isConnected) {
-                statusEl.className = 'connection-indicator connected';
-            } else {
-                statusEl.className = 'connection-indicator disconnected';
-            }
-        }
-
         function handleTeamSelection(option) {
             document.querySelectorAll('.team-option').forEach(opt => {
                 opt.classList.remove('selected');
@@ -1086,7 +1241,7 @@
                 return;
             }
             
-            console.log(`Iniciando quiz para ${selectedTeam}`);
+            console.log(`🎯 Iniciando quiz para ${selectedTeam}`);
             
             quizStartTime = new Date();
             currentScreen = "quiz-gameplay";
@@ -1123,14 +1278,24 @@
                 timestamp: new Date().toLocaleTimeString('pt-BR')
             };
 
-            // Salvar resposta localmente (simulando envio para servidor)
-            responses.push(responseData);
-            console.log(`Resposta salva: ${selectedAnswer} para questão ${currentQuestionIndex + 1} (${isCorrect ? 'Correta' : 'Incorreta'})`);
-            
             // Desabilitar botão temporariamente
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
-            submitBtn.textContent = 'PROCESSANDO...';
+            submitBtn.textContent = 'ENVIANDO...';
+
+            // Enviar para servidor via Socket.io (se conectado)
+            if (isConnected && socket) {
+                socket.emit('submit-answer', responseData);
+            } else {
+                // Fallback: simular confirmação
+                setTimeout(() => {
+                    showNotification('✅ RESPOSTA REGISTRADA (OFFLINE)!', 'success');
+                }, 500);
+            }
+            
+            // Salvar localmente (backup)
+            responses.push(responseData);
+            console.log(`📝 Resposta salva: ${selectedAnswer} para questão ${currentQuestionIndex + 1} (${isCorrect ? 'Correta' : 'Incorreta'})`);
             
             showSuccessMessage();
             
@@ -1146,7 +1311,12 @@
         }
 
         function finishQuiz() {
-            console.log('Finalizando quiz');
+            console.log('🏁 Finalizando quiz');
+            
+            // Enviar evento de finalização se conectado
+            if (isConnected && socket) {
+                socket.emit('finish-quiz', { team: selectedTeam });
+            }
             
             currentScreen = "final-screen";
             
@@ -1167,7 +1337,7 @@
         }
 
         function resetToStart() {
-            console.log('Resetando para o início');
+            console.log('🔄 Resetando para o início');
             
             currentQuestionIndex = 0;
             selectedAnswer = "";
@@ -1232,7 +1402,7 @@
             const currentQuestion = questions[currentQuestionIndex];
             const questionNumber = currentQuestionIndex + 1;
             
-            console.log(`Exibindo questão ${questionNumber}: ${currentQuestion.question.substring(0, 50)}...`);
+            console.log(`❓ Exibindo questão ${questionNumber}: ${currentQuestion.question.substring(0, 50)}...`);
             
             document.getElementById('question-number').textContent = `QUESTÃO ${questionNumber} DE ${questions.length}`;
             document.getElementById('question-text').textContent = currentQuestion.question;
@@ -1273,7 +1443,7 @@
             document.querySelector(`[data-view="${viewName}"]`).classList.add('active');
         }
 
-        // Funções do Admin - CORRIGIDAS
+        // Funções do Admin
         function adminLogin() {
             const password = document.getElementById('admin-password').value.trim();
             
@@ -1282,33 +1452,23 @@
                 return;
             }
 
-            console.log('Tentando login admin com senha:', password);
+            console.log('👑 Tentando login admin...');
             
-            // Validação da senha
-            if (password === mockAdminPassword) {
-                console.log('Admin autenticado com sucesso');
-                isAdmin = true;
-                
-                // Mostrar área admin
-                document.getElementById('admin-login').style.display = 'none';
-                document.getElementById('admin-content').style.display = 'block';
-                
-                // Atualizar dados
-                updateAdminData();
-                
-                showNotification('✅ ACESSO ADMIN LIBERADO!', 'success');
-                updateTerminalStatus('Admin conectado - Monitoramento ativo');
-                
+            // Enviar via Socket.io se conectado
+            if (isConnected && socket) {
+                socket.emit('admin-login', { password: password });
             } else {
-                console.log('Senha incorreta');
-                showNotification('❌ SENHA INCORRETA!', 'error');
-                document.getElementById('admin-password').value = '';
-                document.getElementById('admin-password').focus();
+                // Fallback: validação local
+                if (password === 'fatec2024') {
+                    handleAdminAuthenticated({ responses: responses });
+                } else {
+                    handleAdminError('Senha incorreta');
+                }
             }
         }
 
         function updateAdminData() {
-            console.log('Atualizando dados do admin, respostas:', responses.length);
+            console.log('📊 Atualizando dados do admin, respostas:', responses.length);
             
             const stats = {
                 totalResponses: responses.length,
@@ -1440,30 +1600,58 @@
 
         function adminResetQuiz() {
             if (confirm('Tem certeza que deseja reiniciar o quiz? Todos os dados serão perdidos!')) {
-                console.log('Admin resetando quiz');
+                console.log('🔄 Admin resetando quiz');
                 
-                responses = [];
-                resetToStart();
-                updateAdminData();
+                // Enviar reset via Socket.io se conectado
+                if (isConnected && socket) {
+                    socket.emit('admin-reset', { password: 'fatec2024' });
+                } else {
+                    // Reset local
+                    responses = [];
+                    resetToStart();
+                    updateAdminData();
+                }
+                
                 showNotification('🔄 QUIZ REINICIADO PELO ADMIN!', 'info');
                 updateTerminalStatus('Quiz resetado pelo administrador');
             }
         }
 
         function refreshAdminData() {
-            console.log('Atualizando dados admin');
+            console.log('🔄 Atualizando dados admin');
+            
+            // Solicitar refresh via Socket.io se conectado
+            if (isConnected && socket) {
+                socket.emit('admin-refresh', { password: 'fatec2024' });
+            }
+            
             updateAdminData();
             showNotification('🔄 DADOS ATUALIZADOS!', 'info');
         }
 
         // Tratamento de erros globais
         window.addEventListener('error', (e) => {
-            console.error('Erro capturado:', e);
+            console.error('❌ Erro capturado:', e);
+            updateTerminalStatus('Erro detectado no sistema');
         });
 
         window.addEventListener('unhandledrejection', (e) => {
-            console.error('Promise rejeitada:', e.reason);
+            console.error('❌ Promise rejeitada:', e.reason);
         });
+
+        // Verificação periódica de conexão
+        setInterval(() => {
+            if (socket && !socket.connected && isConnected) {
+                isConnected = false;
+                updateConnectionStatus('disconnected');
+                updateTerminalStatus('Conexão perdida - Tentando reconectar...');
+            }
+        }, 5000);
+
+        // Log de início
+        console.log('🎯 Quiz FATEC inicializado');
+        console.log('🌐 URL:', window.location.origin);
+        console.log('👥 Suporte multi-device ativo');
     </script>
 </body>
 </html>
