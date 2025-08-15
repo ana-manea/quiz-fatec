@@ -238,12 +238,12 @@
             background: var(--darker-bg);
         }
 
-        .team-option.team-1 { border-color: #ff0040; color: #ff0040; }
-        .team-option.team-2 { border-color: #ff4000; color: #ff4000; }
-        .team-option.team-3 { border-color: #ff8000; color: #ff8000; }
-        .team-option.team-4 { border-color: #ffff00; color: #ffff00; }
-        .team-option.team-5 { border-color: #8000ff; color: #8000ff; }
-        .team-option.team-6 { border-color: #ff0080; color: #ff0080; }
+        .team-option.team-red { border-color: #FF3333; color: #FF3333; }
+        .team-option.team-yellow { border-color: #FFD700; color: #FFD700; }
+        .team-option.team-purple { border-color: #9966FF; color: #9966FF; }
+        .team-option.team-blue { border-color: #3399FF; color: #3399FF; }
+        .team-option.team-brown { border-color: #CC7722; color: #CC7722; }
+        .team-option.team-green { border-color: #33CC33; color: #33CC33; }
 
         .team-option:hover {
             transform: translateY(-3px) scale(1.02);
@@ -595,12 +595,12 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
-        .team-score-card.team-1 { border-color: #ff0040; }
-        .team-score-card.team-2 { border-color: #ff4000; }
-        .team-score-card.team-3 { border-color: #ff8000; }
-        .team-score-card.team-4 { border-color: #ffff00; }
-        .team-score-card.team-5 { border-color: #8000ff; }
-        .team-score-card.team-6 { border-color: #ff0080; }
+        .team-score-card.team-red { border-color: #FF3333; }
+        .team-score-card.team-yellow { border-color: #FFD700; }
+        .team-score-card.team-purple { border-color: #9966FF; }
+        .team-score-card.team-blue { border-color: #3399FF; }
+        .team-score-card.team-brown { border-color: #CC7722; }
+        .team-score-card.team-green { border-color: #33CC33; }
 
         .team-score-name {
             font-family: 'Orbitron', monospace;
@@ -611,12 +611,12 @@
             letter-spacing: 0.05em;
         }
 
-        .team-score-name.team-1 { color: #ff0040; }
-        .team-score-name.team-2 { color: #ff4000; }
-        .team-score-name.team-3 { color: #ff8000; }
-        .team-score-name.team-4 { color: #ffff00; }
-        .team-score-name.team-5 { color: #8000ff; }
-        .team-score-name.team-6 { color: #ff0080; }
+        .team-score-name.team-red { color: #FF3333; }
+        .team-score-name.team-yellow { color: #FFD700; }
+        .team-score-name.team-purple { color: #9966FF; }
+        .team-score-name.team-blue { color: #3399FF; }
+        .team-score-name.team-brown { color: #CC7722; }
+        .team-score-name.team-green { color: #33CC33; }
 
         .team-score-value {
             font-family: 'Orbitron', monospace;
@@ -650,12 +650,12 @@
             position: relative;
         }
 
-        .team-score-progress-bar.team-1 { background: linear-gradient(90deg, #ff0040, #ff4080); }
-        .team-score-progress-bar.team-2 { background: linear-gradient(90deg, #ff4000, #ff8040); }
-        .team-score-progress-bar.team-3 { background: linear-gradient(90deg, #ff8000, #ffb040); }
-        .team-score-progress-bar.team-4 { background: linear-gradient(90deg, #ffff00, #ffff80); }
-        .team-score-progress-bar.team-5 { background: linear-gradient(90deg, #8000ff, #b040ff); }
-        .team-score-progress-bar.team-6 { background: linear-gradient(90deg, #ff0080, #ff40b0); }
+        .team-score-progress-bar.team-red { background: linear-gradient(90deg, #FF3333, #FF6666); }
+        .team-score-progress-bar.team-yellow { background: linear-gradient(90deg, #FFD700, #FFFF80); }
+        .team-score-progress-bar.team-purple { background: linear-gradient(90deg, #9966FF, #CC99FF); }
+        .team-score-progress-bar.team-blue { background: linear-gradient(90deg, #3399FF, #66CCFF); }
+        .team-score-progress-bar.team-brown { background: linear-gradient(90deg, #CC7722, #DDAA55); }
+        .team-score-progress-bar.team-green { background: linear-gradient(90deg, #33CC33, #66FF66); }
 
         @media (max-width: 768px) {
             .container {
@@ -689,7 +689,6 @@
             }
         }
 
-        /* Esconder o debug panel */
         .debug-panel {
             display: none;
         }
@@ -700,15 +699,15 @@
 
     <div class="container">
         <div class="header">
-            <div class="logo">CYBERQUIZ FATEC</div>
-            <div class="subtitle">SISTEMA MULTIPLAYER - TEMPO REAL</div>
-            <div class="terminal-text" id="terminal-status">> Sistema inicializando... Conectando ao servidor...</div>
+            <div class="logo">QUIZ FATEC</div>
+            <div class="subtitle">Sistema Multiplayer - Tempo Real</div>
+            <div class="terminal-text" id="terminal-status">> Sistema inicializando...</div>
         </div>
 
         <div class="progress-container">
             <div class="progress-label">
                 <span>PROGRESSO</span>
-                <span id="progress-text">0 / 10 MISSÕES</span>
+                <span id="progress-text">0 / 10 QUESTÕES</span>
             </div>
             <div class="progress-bar-outer">
                 <div class="progress-bar-inner" id="progress-bar"></div>
@@ -726,29 +725,28 @@
             <div id="team-selection" class="quiz-screen team-selection-screen active">
                 <div class="welcome-message">
                     <div style="font-size: 1.5rem; color: var(--neon-red); margin-bottom: 1rem;">
-                        🚀 BEM-VINDO AO CYBERQUIZ MULTIPLAYER!
+                        🚀 BEM-VINDO AO QUIZ FATEC!
                     </div>
                     <div>
-                        Prepare-se para uma jornada de 10 missões sobre a FATEC.<br>
-                        Suas respostas serão sincronizadas em tempo real!<br>
-                        Primeiro, selecione sua SQUAD para começar a aventura!
+                        Prepare-se para uma jornada de 10 questões sobre a FATEC.<br>
+                        Selecione sua equipe para começar!
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="team">SELECIONE SUA SQUAD:</label>
+                    <label for="team">SELECIONE SUA EQUIPE:</label>
                     <div class="team-grid">
-                        <div class="team-option team-1" data-team="Squad Alpha" data-id="team-1">⚡ SQUAD ALPHA</div>
-                        <div class="team-option team-2" data-team="Squad Beta" data-id="team-2">🔥 SQUAD BETA</div>
-                        <div class="team-option team-3" data-team="Squad Gamma" data-id="team-3">⭐ SQUAD GAMMA</div>
-                        <div class="team-option team-4" data-team="Squad Delta" data-id="team-4">💎 SQUAD DELTA</div>
-                        <div class="team-option team-5" data-team="Squad Epsilon" data-id="team-5">🚀 SQUAD EPSILON</div>
-                        <div class="team-option team-6" data-team="Squad Zeta" data-id="team-6">⚡ SQUAD ZETA</div>
+                        <div class="team-option team-red" data-team="Equipe Vermelha" data-id="team-red">🔴 EQUIPE VERMELHA</div>
+                        <div class="team-option team-yellow" data-team="Equipe Amarela" data-id="team-yellow">🟡 EQUIPE AMARELA</div>
+                        <div class="team-option team-purple" data-team="Equipe Roxa" data-id="team-purple">🟣 EQUIPE ROXA</div>
+                        <div class="team-option team-blue" data-team="Equipe Azul" data-id="team-blue">🔵 EQUIPE AZUL</div>
+                        <div class="team-option team-brown" data-team="Equipe Marrom" data-id="team-brown">🟤 EQUIPE MARROM</div>
+                        <div class="team-option team-green" data-team="Equipe Verde" data-id="team-green">🟢 EQUIPE VERDE</div>
                     </div>
                 </div>
 
                 <button type="button" class="submit-btn" id="start-quiz-btn" disabled>
-                    🎯 INICIAR MISSÕES
+                    🎯 INICIAR QUIZ
                 </button>
             </div>
 
@@ -757,7 +755,7 @@
                 <form id="student-form">
                     <div class="form-group">
                         <div id="current-question-display" class="current-question">
-                            <div class="question-number" id="question-number">MISSÃO 1 DE 10</div>
+                            <div class="question-number" id="question-number">QUESTÃO 1 DE 10</div>
                             <div id="question-text">Aguardando conexão com o servidor...</div>
                             <div class="options-container" id="options-container">
                                 <!-- Options will be populated by JavaScript -->
@@ -765,7 +763,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="submit-btn" id="submit-btn">TRANSMITIR RESPOSTA</button>
+                    <button type="submit" class="submit-btn" id="submit-btn">ENVIAR RESPOSTA</button>
                 </form>
 
                 <div id="success-message" style="display: none;" class="success-message">
@@ -775,36 +773,31 @@
 
             <!-- Tela Final -->
             <div id="final-screen" class="quiz-screen final-screen">
-                <div class="final-title">🏆 MISSÃO COMPLETA!</div>
+                <div class="final-title">🏆 QUIZ COMPLETO!</div>
                 
                 <div class="final-message">
-                    Parabéns! Você concluiu todas as 10 missões do CyberQuiz FATEC com sucesso!<br>
-                    Suas respostas foram transmitidas e registradas no sistema.
+                    Parabéns! Você concluiu todas as 10 questões do Quiz FATEC!<br>
+                    Suas respostas foram registradas no sistema.
                 </div>
 
                 <div class="team-badge" id="final-team-name">
-                    SQUAD ALPHA
+                    EQUIPE VERMELHA
                 </div>
 
                 <div class="completion-stats">
                     <div style="font-size: 1.5rem; margin-bottom: 1rem;">
-                        📊 MISSÃO FINALIZADA
+                        📊 QUIZ FINALIZADO
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
                         <div>
                             <div style="font-size: 2rem; font-weight: bold;">10/10</div>
-                            <div style="font-size: 0.9rem;">Missões Completadas</div>
+                            <div style="font-size: 0.9rem;">Questões Completadas</div>
                         </div>
                         <div>
                             <div style="font-size: 2rem; font-weight: bold;" id="final-timestamp">--:--</div>
                             <div style="font-size: 0.9rem;">Finalizado em</div>
                         </div>
                     </div>
-                </div>
-
-                <div style="color: var(--text-muted); font-size: 1rem; margin-top: 2rem;">
-                    🎉 Obrigado por participar do CyberQuiz FATEC!<br>
-                    Suas respostas foram sincronizadas com o servidor.
                 </div>
 
                 <button type="button" class="submit-btn" id="new-quiz-btn" style="margin-top: 2rem; background: linear-gradient(45deg, var(--neon-cyan), #0080ff);">
@@ -827,7 +820,7 @@
 
                 <div id="admin-content" style="display: none;">
                     <div style="background: var(--darker-bg); border: 1px solid var(--neon-red); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-                        <h3 style="margin-bottom: 1rem; color: var(--neon-red); text-transform: uppercase;">CONTROLE DE QUIZ - TEMPO REAL</h3>
+                        <h3 style="margin-bottom: 1rem; color: var(--neon-red); text-transform: uppercase;">CONTROLE DE QUIZ</h3>
                         <div style="margin-bottom: 1rem;">
                             <button type="button" class="admin-btn danger" id="admin-reset-btn">REINICIAR QUIZ</button>
                             <button type="button" class="admin-btn info" id="admin-refresh-btn">ATUALIZAR DADOS</button>
@@ -841,7 +834,7 @@
                         </div>
                         <div class="admin-stat-card">
                             <div class="admin-stat-value" id="admin-unique-teams">0</div>
-                            <div class="admin-stat-label">Squads Participantes</div>
+                            <div class="admin-stat-label">Equipes Participantes</div>
                         </div>
                         <div class="admin-stat-card">
                             <div class="admin-stat-value" id="admin-quiz-progress">0%</div>
@@ -851,10 +844,10 @@
 
                     <!-- Seção de Pontuação por Equipe -->
                     <div style="background: var(--darker-bg); border: 1px solid var(--neon-green); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-                        <h3 style="margin-bottom: 1rem; color: var(--neon-green); text-transform: uppercase;">🏆 PONTUAÇÃO POR SQUAD</h3>
+                        <h3 style="margin-bottom: 1rem; color: var(--neon-green); text-transform: uppercase;">🏆 PONTUAÇÃO POR EQUIPE</h3>
                         <div id="team-scores-container" class="team-scores-grid">
                             <div style="text-align: center; color: var(--text-muted); padding: 1rem; font-family: 'JetBrains Mono', monospace;">
-                                > Aguardando participação das squads...
+                                > Aguardando participação das equipes...
                             </div>
                         </div>
                     </div>
@@ -876,115 +869,112 @@
         </div>
     </div>
 
-    <!-- Socket.IO Script -->
-    <script src="/socket.io/socket.io.js"></script>
     <script>
         // Base de dados das perguntas sobre FATEC
         const questions = [
             {
-                question: "O que significa a sigla FATEC?",
+                question: "Qual é o principal produto do minhocário que enriquece as plantas da FATEC?",
                 options: [
-                    "Faculdade de Tecnologia Empresarial e Científica",
-                    "Faculdade de Tecnologia do Estado de São Paulo",
-                    "Fundação de Apoio à Tecnologia e Ciência",
-                    "Faculdade de Tecnologia e Computação"
+                    "Água purificada",
+                    "Adubo químico", 
+                    "Húmus de minhoca",
+                    "Sementes"
+                ],
+                correct: "C"
+            },
+            {
+                question: "Qual é a principal diferença entre os laboratórios externos (6 e 7) e os internos (1 a 5)?",
+                options: [
+                    "Os externos são para aulas de informática e programação",
+                    "Nos internos é permitido comer, mas nos externos não",
+                    "Os internos têm apenas desktops, e os externos apenas notebooks",
+                    "Os externos não permitem notebooks pessoais"
+                ],
+                correct: "D"
+            },
+            {
+                question: "A biblioteca da FATEC atende qual público e qual é um de seus objetivos?",
+                options: [
+                    "Só alunos, para guardar livros",
+                    "Apenas professores e funcionários, para reuniões",
+                    "Exclusivamente a professores, para pesquisa",
+                    "Alunos e a comunidade externa, para incentivar a leitura e cultura"
+                ],
+                correct: "D"
+            },
+            {
+                question: "Qual é uma responsabilidade dos coordenadores Rodrigo e Elaine?",
+                options: [
+                    "Ajudar alunos com rematrícula",
+                    "Serem responsáveis pelo projeto pedagógico dos cursos",
+                    "Supervisionar a secretaria",
+                    "Organizar os horários de treino da atlética"
                 ],
                 correct: "B"
             },
             {
-                question: "Em que ano foi criada a primeira FATEC?",
+                question: "Como se faz para usar o Lab Maker e o estúdio de podcast?",
                 options: [
-                    "1968",
-                    "1969", 
-                    "1970",
-                    "1971"
+                    "O agendamento é feito com o professor da disciplina",
+                    "Precisa da autorização do professor Daniel",
+                    "Apenas para projetos de tecnologia",
+                    "É preciso ser do curso de ADS"
+                ],
+                correct: "B"
+            },
+            {
+                question: "Qual é a forma correta de solicitar a carteirinha de estudante da FATEC?",
+                options: [
+                    "Pessoalmente, na secretaria",
+                    "Com o professor da disciplina",
+                    "Por e-mail para f157.secretaria@fatec.sp.gov.br",
+                    "No site da ARINTER"
                 ],
                 correct: "C"
             },
             {
-                question: "Qual é o órgão responsável pela administração das FATECs?",
+                question: "Qual a relação da horta com o curso de Produção Agropecuária?",
                 options: [
-                    "USP - Universidade de São Paulo",
-                    "UNICAMP - Universidade Estadual de Campinas",
-                    "CEETEPS - Centro Estadual de Educação Tecnológica Paula Souza",
-                    "UNESP - Universidade Estadual Paulista"
+                    "É um local para lazer dos alunos",
+                    "É onde disciplinas como 'Fertilidade do solo' desenvolvem projetos",
+                    "É supervisionada pela ex-aluna Priscila Cislei",
+                    "A renda da venda dos produtos vai para a Atlética"
                 ],
-                correct: "C"
+                correct: "B"
             },
             {
-                question: "Qual foi a primeira FATEC criada no Estado de São Paulo?",
+                question: "Quais esportes, período de treino e mascote da Atlética são mencionados no texto?",
                 options: [
-                    "FATEC São Paulo",
-                    "FATEC Campinas",
-                    "FATEC Santos",
-                    "FATEC São Bernardo do Campo"
+                    "Basquete, à noite, e o mascote é o Leão",
+                    "Futebol e basquete, de dia, e o mascote é o Grilo",
+                    "Vôlei e futsal, de dia, e o mascote é o Professor",
+                    "Futsal e vôlei, à noite, e o mascote é o Zangão"
+                ],
+                correct: "D"
+            },
+            {
+                question: "O que não é permitido fazer na biblioteca da FATEC?",
+                options: [
+                    "Entrar com mochilas",
+                    "Conversar com colegas sobre o estudo",
+                    "Utilizar os armários próximos para guardar pertences",
+                    "Pegar livros emprestados"
                 ],
                 correct: "A"
             },
             {
-                question: "Qual é a duração típica dos cursos de graduação tecnológica nas FATECs?",
+                question: "Qual é o objetivo principal da casa de garrafa pet, e quem a idealizou?",
                 options: [
-                    "2 anos",
-                    "3 anos",
-                    "4 anos",
-                    "5 anos"
-                ],
-                correct: "B"
-            },
-            {
-                question: "As FATECs são instituições de ensino:",
-                options: [
-                    "Privadas com fins lucrativos",
-                    "Privadas sem fins lucrativos",
-                    "Públicas estaduais",
-                    "Públicas federais"
-                ],
-                correct: "C"
-            },
-            {
-                question: "Qual é o principal foco dos cursos oferecidos pelas FATECs?",
-                options: [
-                    "Formação acadêmica teórica",
-                    "Formação tecnológica aplicada ao mercado de trabalho",
-                    "Pesquisa científica avançada",
-                    "Extensão universitária"
-                ],
-                correct: "B"
-            },
-            {
-                question: "O vestibular das FATECs é realizado quantas vezes por ano?",
-                options: [
-                    "1 vez por ano",
-                    "2 vezes por ano",
-                    "3 vezes por ano",
-                    "4 vezes por ano"
-                ],
-                correct: "B"
-            },
-            {
-                question: "Qual das seguintes áreas NÃO é tradicionalmente oferecida pelas FATECs?",
-                options: [
-                    "Tecnologia da Informação",
-                    "Gestão e Negócios",
-                    "Medicina",
-                    "Produção Industrial"
-                ],
-                correct: "C"
-            },
-            {
-                question: "O diploma de um curso superior de tecnologia da FATEC tem o mesmo valor legal de:",
-                options: [
-                    "Curso técnico",
-                    "Curso de bacharelado",
-                    "Curso de especialização",
-                    "Curso de extensão"
+                    "Criar um espaço para reuniões de professores, idealizado pela professora Elaine",
+                    "Construir uma estrutura sustentável com garrafas pet, idealizada pela ex-aluna Priscila Cislei",
+                    "Usar garrafas pet para o plantio de hortaliças, idealizado pela aluna da Atlética",
+                    "Projetar um novo laboratório para o curso de agronegócio, idealizado pelo professor Rodrigo"
                 ],
                 correct: "B"
             }
         ];
 
         // Variáveis do sistema
-        let socket;
         let currentQuestionIndex = 0;
         let selectedTeam = "";
         let selectedTeamId = "";
@@ -993,17 +983,21 @@
         let currentScreen = "team-selection";
         let isConnected = false;
         let isAdmin = false;
+        let responses = [];
 
         // Inicialização do sistema
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Inicializando CyberQuiz FATEC...');
+            console.log('Inicializando Quiz FATEC...');
             
             // Event listeners para botões
             setupEventListeners();
             
-            // Aguardar um pouco antes de tentar conectar
+            // Simular conexão para demonstração
             setTimeout(() => {
-                initializeSocket();
+                isConnected = true;
+                updateConnectionStatus();
+                updateTerminalStatus('Sistema online... Aguardando participantes...');
+                showNotification('🟢 SISTEMA INICIADO!', 'success');
             }, 1000);
             
             updateProgressBar();
@@ -1047,133 +1041,6 @@
             });
         }
 
-        // Inicializar Socket.IO
-        function initializeSocket() {
-            console.log('Tentando conectar ao servidor...');
-            updateTerminalStatus('Conectando ao servidor...');
-            
-            try {
-                // Detecta se está em produção ou local
-                const serverUrl = window.location.hostname.includes("onrender.com")
-                    ? window.location.origin
-                    : "http://localhost:3000";
-                
-                console.log(`Conectando em: ${serverUrl}`);
-                
-                socket = io(serverUrl, {
-                    timeout: 10000,
-                    forceNew: true,
-                    reconnection: true,
-                    reconnectionDelay: 1000,
-                    reconnectionAttempts: 5,
-                    transports: ['websocket', 'polling']
-                });
-
-                setupSocketEvents();
-
-            } catch (error) {
-                console.error(`Erro fatal na inicialização: ${error.message}`);
-                updateTerminalStatus('Erro fatal... Recarregue a página...');
-                showNotification('💀 ERRO FATAL! RECARREGUE A PÁGINA!', 'error');
-            }
-        }
-
-        function setupSocketEvents() {
-            socket.on('connect', () => {
-                console.log('Conectado ao servidor!');
-                isConnected = true;
-                updateConnectionStatus();
-                updateTerminalStatus('Sistema online... Aguardando participantes...');
-                showNotification('🟢 CONECTADO AO SERVIDOR!', 'success');
-            });
-
-            socket.on('disconnect', (reason) => {
-                console.log(`Desconectado: ${reason}`);
-                isConnected = false;
-                updateConnectionStatus();
-                updateTerminalStatus('Conexão perdida... Tentando reconectar...');
-                showNotification('🔴 CONEXÃO PERDIDA!', 'error');
-            });
-
-            socket.on('connect_error', (error) => {
-                console.log(`Erro de conexão: ${error.message}`);
-                isConnected = false;
-                updateConnectionStatus();
-                updateTerminalStatus('Erro de conexão... Verifique se o servidor está rodando...');
-                showNotification('⚠️ ERRO DE CONEXÃO!', 'error');
-            });
-
-            socket.on('reconnect', (attemptNumber) => {
-                console.log(`Reconectado após ${attemptNumber} tentativa(s)`);
-                showNotification('🟢 RECONECTADO!', 'success');
-            });
-
-            socket.on('quiz-status', (data) => {
-                console.log(`Status do quiz recebido: ${data.totalResponses} respostas`);
-                updateProgressBar();
-            });
-
-            socket.on('answer-received', (data) => {
-                console.log(`Resposta confirmada: ${data.success}`);
-                if (data.success) {
-                    showSuccessMessage();
-                    
-                    setTimeout(() => {
-                        if (currentQuestionIndex < questions.length - 1) {
-                            currentQuestionIndex++;
-                            updateQuestionDisplay();
-                            resetQuestionSelection();
-                        } else {
-                            finishQuiz();
-                        }
-                    }, 1500);
-                } else {
-                    showNotification('❌ ERRO AO ENVIAR RESPOSTA!', 'error');
-                }
-            });
-
-            socket.on('quiz-completed', (data) => {
-                console.log(`Quiz concluído: ${data.percentage}%`);
-                // Não mostramos mais as estatísticas de acertos para o aluno
-            });
-
-            socket.on('quiz-reset', () => {
-                console.log('Quiz resetado pelo admin');
-                if (!isAdmin) {
-                    resetToStart();
-                    showNotification('🔄 QUIZ REINICIADO PELO ADMIN!', 'info');
-                }
-            });
-
-            // Events do admin
-            socket.on('admin-authenticated', (data) => {
-                console.log('Admin autenticado com sucesso');
-                isAdmin = true;
-                document.getElementById('admin-login').style.display = 'none';
-                document.getElementById('admin-content').style.display = 'block';
-                updateAdminData(data);
-                showNotification('✅ ACESSO ADMIN LIBERADO!', 'success');
-            });
-
-            socket.on('admin-error', (message) => {
-                console.log(`Erro admin: ${message}`);
-                showNotification('❌ ' + message.toUpperCase(), 'error');
-                document.getElementById('admin-password').value = '';
-            });
-
-            socket.on('admin-update', (data) => {
-                if (isAdmin) {
-                    console.log('Dados admin atualizados');
-                    updateAdminData(data);
-                }
-            });
-
-            socket.on('error', (message) => {
-                console.log(`Erro: ${message}`);
-                showNotification('⚠️ ' + message.toUpperCase(), 'error');
-            });
-        }
-
         function updateTerminalStatus(message) {
             const terminalEl = document.getElementById('terminal-status');
             if (terminalEl) {
@@ -1206,12 +1073,8 @@
             
             document.getElementById('start-quiz-btn').disabled = false;
             
-            console.log(`Squad selecionada: ${selectedTeam}`);
-            showNotification('✅ SQUAD SELECIONADA!', 'success');
-            
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
+            console.log(`Equipe selecionada: ${selectedTeam}`);
+            showNotification('✅ EQUIPE SELECIONADA!', 'success');
         }
 
         function handleAnswerSelection(option) {
@@ -1227,7 +1090,7 @@
 
         function startQuiz() {
             if (!selectedTeam || !isConnected) {
-                showNotification('⚠️ SELECIONE UMA SQUAD E CONECTE-SE!', 'error');
+                showNotification('⚠️ SELECIONE UMA EQUIPE E CONECTE-SE!', 'error');
                 return;
             }
             
@@ -1260,6 +1123,7 @@
             }
 
             const currentQuestion = questions[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.correct;
             
             const responseData = {
                 team: selectedTeam,
@@ -1267,24 +1131,27 @@
                 question: currentQuestion.question,
                 questionIndex: currentQuestionIndex,
                 answer: selectedAnswer,
-                correctAnswer: currentQuestion.correct
+                correctAnswer: currentQuestion.correct,
+                isCorrect: isCorrect,
+                timestamp: new Date().toLocaleTimeString('pt-BR')
             };
 
-            console.log(`Enviando resposta: ${selectedAnswer} para questão ${currentQuestionIndex + 1}`);
-            
-            socket.emit('submit-answer', responseData);
+            // Adicionar à lista de respostas
+            responses.push(responseData);
 
-            // Animação de envio
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'ENVIANDO...';
+            console.log(`Resposta: ${selectedAnswer} para questão ${currentQuestionIndex + 1} (${isCorrect ? 'Correta' : 'Incorreta'})`);
+            
+            showSuccessMessage();
             
             setTimeout(() => {
-                if (submitBtn.disabled) {
-                    submitBtn.textContent = 'TRANSMITIR RESPOSTA';
-                    submitBtn.disabled = false;
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    updateQuestionDisplay();
+                    resetQuestionSelection();
+                } else {
+                    finishQuiz();
                 }
-            }, 5000);
+            }, 1500);
         }
 
         function finishQuiz() {
@@ -1293,7 +1160,7 @@
             currentScreen = "final-screen";
             
             document.getElementById('progress-bar').style.width = '100%';
-            document.getElementById('progress-text').textContent = `${questions.length} / ${questions.length} MISSÕES`;
+            document.getElementById('progress-text').textContent = `${questions.length} / ${questions.length} QUESTÕES`;
             
             document.getElementById('quiz-gameplay').classList.remove('active');
             document.getElementById('final-screen').classList.add('active');
@@ -1303,9 +1170,6 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
-            
-            // Solicitar dados finais do servidor
-            socket.emit('finish-quiz', { team: selectedTeam });
             
             updateTerminalStatus('Quiz finalizado!');
             showNotification('🎉 PARABÉNS! QUIZ FINALIZADO!', 'success');
@@ -1346,7 +1210,7 @@
             
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = false;
-            submitBtn.textContent = 'TRANSMITIR RESPOSTA';
+            submitBtn.textContent = 'ENVIAR RESPOSTA';
         }
 
         function showNotification(message, type = 'info') {
@@ -1379,7 +1243,7 @@
             
             console.log(`Exibindo questão ${questionNumber}: ${currentQuestion.question.substring(0, 50)}...`);
             
-            document.getElementById('question-number').textContent = `MISSÃO ${questionNumber} DE ${questions.length}`;
+            document.getElementById('question-number').textContent = `QUESTÃO ${questionNumber} DE ${questions.length}`;
             document.getElementById('question-text').textContent = currentQuestion.question;
             
             const optionsContainer = document.getElementById('options-container');
@@ -1403,7 +1267,7 @@
         function updateProgressBar() {
             const progress = (currentQuestionIndex / questions.length) * 100;
             document.getElementById('progress-bar').style.width = progress + '%';
-            document.getElementById('progress-text').textContent = `${currentQuestionIndex} / ${questions.length} MISSÕES`;
+            document.getElementById('progress-text').textContent = `${currentQuestionIndex} / ${questions.length} QUESTÕES`;
         }
 
         function showView(viewName) {
@@ -1426,29 +1290,37 @@
                 return;
             }
             
-            if (!isConnected) {
-                showNotification('❌ SEM CONEXÃO COM SERVIDOR!', 'error');
-                return;
+            // Simular login (normalmente seria enviado para o servidor)
+            if (password === 'admin123') {
+                console.log('Admin autenticado');
+                isAdmin = true;
+                document.getElementById('admin-login').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                updateAdminData();
+                showNotification('✅ ACESSO ADMIN LIBERADO!', 'success');
+            } else {
+                showNotification('❌ SENHA INCORRETA!', 'error');
+                document.getElementById('admin-password').value = '';
             }
-            
-            console.log('Tentando login admin');
-            socket.emit('admin-login', { password: password });
         }
 
-        function updateAdminData(data) {
+        function updateAdminData() {
             console.log('Atualizando dados do admin');
             
-            if (data.stats) {
-                const stats = data.stats;
-                document.getElementById('admin-total-responses').textContent = stats.totalResponses || 0;
-                document.getElementById('admin-unique-teams').textContent = stats.uniqueTeams || 0;
-                document.getElementById('admin-quiz-progress').textContent = `${stats.progressPercentage || 0}%`;
-            }
+            // Calcular estatísticas
+            const stats = {
+                totalResponses: responses.length,
+                uniqueTeams: [...new Set(responses.map(r => r.team))].length,
+                progressPercentage: responses.length > 0 ? 
+                    Math.round((responses.length / (6 * questions.length)) * 100) : 0
+            };
+            
+            document.getElementById('admin-total-responses').textContent = stats.totalResponses;
+            document.getElementById('admin-unique-teams').textContent = stats.uniqueTeams;
+            document.getElementById('admin-quiz-progress').textContent = `${stats.progressPercentage}%`;
 
-            if (data.responses) {
-                updateAdminResponses(data.responses);
-                updateTeamScores(data.responses);
-            }
+            updateAdminResponses(responses);
+            updateTeamScores(responses);
 
             document.getElementById('admin-last-update').textContent = '🟢 Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
         }
@@ -1459,7 +1331,7 @@
             if (!responses || responses.length === 0) {
                 container.innerHTML = `
                     <div style="text-align: center; color: var(--text-muted); padding: 1rem; font-family: 'JetBrains Mono', monospace; grid-column: 1 / -1;">
-                        > Aguardando participação das squads...
+                        > Aguardando participação das equipes...
                     </div>
                 `;
                 return;
@@ -1467,17 +1339,9 @@
 
             // Calcular pontuações por equipe
             const teamScores = {};
-            const teamNames = {
-                'team-1': 'Squad Alpha',
-                'team-2': 'Squad Beta', 
-                'team-3': 'Squad Gamma',
-                'team-4': 'Squad Delta',
-                'team-5': 'Squad Epsilon',
-                'team-6': 'Squad Zeta'
-            };
 
             responses.forEach(response => {
-                const teamId = response.teamId || 'team-1';
+                const teamId = response.teamId;
                 const teamName = response.team;
                 
                 if (!teamScores[teamId]) {
@@ -1496,11 +1360,11 @@
 
             // Criar cards de pontuação
             const scoreCards = Object.keys(teamScores)
-                .sort((a, b) => teamScores[b].correct - teamScores[a].correct) // Ordenar por pontuação
+                .sort((a, b) => teamScores[b].correct - teamScores[a].correct)
                 .map(teamId => {
                     const score = teamScores[teamId];
                     const percentage = score.total > 0 ? (score.correct / score.total * 100) : 0;
-                    const progressWidth = score.total > 0 ? (score.correct / 10 * 100) : 0; // Progress baseado em 10 questões
+                    const progressWidth = score.total > 0 ? (score.correct / 10 * 100) : 0;
                     
                     return `
                         <div class="team-score-card ${teamId}">
@@ -1517,11 +1381,7 @@
                     `;
                 }).join('');
 
-            container.innerHTML = scoreCards || `
-                <div style="text-align: center; color: var(--text-muted); padding: 1rem; font-family: 'JetBrains Mono', monospace; grid-column: 1 / -1;">
-                    > Nenhuma squad participou ainda...
-                </div>
-            `;
+            container.innerHTML = scoreCards;
         }
 
         function updateAdminResponses(responses) {
@@ -1540,7 +1400,7 @@
             const recentResponses = responses.slice(-10).reverse();
 
             container.innerHTML = recentResponses.map(response => {
-                const teamClass = response.teamId || 'team-1';
+                const teamClass = response.teamId;
                 const correctIcon = response.isCorrect ? '✅' : '❌';
                 const statusColor = response.isCorrect ? '#00ff80' : '#ff4040';
                 
@@ -1551,7 +1411,7 @@
                             <span style="color: var(--text-muted); font-size: 0.8rem;">${response.timestamp}</span>
                         </div>
                         <div style="margin-bottom: 0.5rem;">
-                            <strong>Missão ${response.questionIndex + 1}:</strong> ${response.question.substring(0, 80)}${response.question.length > 80 ? '...' : ''}
+                            <strong>Questão ${response.questionIndex + 1}:</strong> ${response.question.substring(0, 80)}${response.question.length > 80 ? '...' : ''}
                         </div>
                         <div style="margin-bottom: 0.5rem;">
                             <strong>Resposta:</strong> <span style="color: ${statusColor};">${response.answer} ${correctIcon}</span>
@@ -1566,37 +1426,32 @@
 
         function getTeamColor(teamId) {
             const colors = {
-                'team-1': '#ff0040',
-                'team-2': '#ff4000', 
-                'team-3': '#ff8000',
-                'team-4': '#ffff00',
-                'team-5': '#8000ff',
-                'team-6': '#ff0080'
+                'team-red': '#FF3333',
+                'team-yellow': '#FFD700',
+                'team-purple': '#9966FF',
+                'team-blue': '#3399FF',
+                'team-brown': '#CC7722',
+                'team-green': '#33CC33'
             };
-            return colors[teamId] || '#ff0040';
+            return colors[teamId] || '#FF3333';
         }
 
         function adminResetQuiz() {
-            if (!isConnected) {
-                showNotification('❌ SEM CONEXÃO COM SERVIDOR!', 'error');
-                return;
-            }
-            
             if (confirm('Tem certeza que deseja reiniciar o quiz? Todos os dados serão perdidos!')) {
                 console.log('Admin resetando quiz');
-                socket.emit('admin-reset', { password: 'fatec2024' });
+                responses = [];
+                
+                // Reset all users (simulação)
+                resetToStart();
+                updateAdminData();
+                
                 showNotification('🔄 QUIZ REINICIADO!', 'info');
             }
         }
 
         function refreshAdminData() {
-            if (!isConnected) {
-                showNotification('❌ SEM CONEXÃO COM SERVIDOR!', 'error');
-                return;
-            }
-            
             console.log('Atualizando dados admin');
-            socket.emit('admin-refresh', { password: 'fatec2024' });
+            updateAdminData();
             showNotification('🔄 DADOS ATUALIZADOS!', 'info');
         }
 
