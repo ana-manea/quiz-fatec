@@ -1421,36 +1421,28 @@
 
         function updateAdminData(serverStats = null) {
             console.log('Atualizando dados do admin');
-
+            
             let stats;
-            if (serverStats) {
-                stats = serverStats;
-            } else {
-                stats = {
-                    totalResponses: responses.length,
-                    uniqueTeams: [...new Set(responses.map(r => r.team))].length,
-                    progressPercentage: responses.length > 0 ? 
-                        Math.round((responses.length / (6 * questions.length)) * 100) : 0
-                };
+                if (serverStats) {
+                    stats = serverStats;
+                } else {
+                    stats = {
+                        totalResponses: responses.length,
+                        uniqueTeams: [...new Set(responses.map(r => r.team))].length,
+                        progressPercentage: responses.length > 0 ? 
+                            Math.round((responses.length / (6 * questions.length)) * 100) : 0
+                    };
+                }
+                
+                document.getElementById('admin-total-responses').textContent = stats.totalResponses;
+                document.getElementById('admin-unique-teams').textContent = stats.uniqueTeams;
+                document.getElementById('admin-quiz-progress').textContent = `${stats.progressPercentage}%`;
+            
+                updateAdminResponses(responses);
+                updateTeamScores(responses);
+            
+                document.getElementById('admin-last-update').textContent = '🟢 Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
             }
-            
-            // Calcular estatísticas
-            const stats = {
-                totalResponses: responses.length,
-                uniqueTeams: [...new Set(responses.map(r => r.team))].length,
-                progressPercentage: responses.length > 0 ? 
-                    Math.round((responses.length / (6 * questions.length)) * 100) : 0
-            };
-            
-            document.getElementById('admin-total-responses').textContent = stats.totalResponses;
-            document.getElementById('admin-unique-teams').textContent = stats.uniqueTeams;
-            document.getElementById('admin-quiz-progress').textContent = `${stats.progressPercentage}%`;
-
-            updateAdminResponses(responses);
-            updateTeamScores(responses);
-
-            document.getElementById('admin-last-update').textContent = '🟢 Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
-        }
 
         function updateTeamScores(responses) {
             const container = document.getElementById('team-scores-container');
