@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CyberQuiz FATEC - Multiplayer</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <script src="/socket.io/socket.io.js"></script>
     <style>
         * {
             margin: 0;
@@ -625,7 +624,7 @@
                     </div>
                 </div>
 
-                <button type="button" class="submit-btn" id="start-quiz-btn" onclick="startQuiz()" disabled>
+                <button type="button" class="submit-btn" id="start-quiz-btn" disabled>
                     🎯 INICIAR MISSÕES
                 </button>
             </div>
@@ -688,7 +687,7 @@
                     Suas respostas foram sincronizadas com o servidor.
                 </div>
 
-                <button type="button" class="submit-btn" onclick="resetToStart()" style="margin-top: 2rem; background: linear-gradient(45deg, var(--neon-cyan), #0080ff);">
+                <button type="button" class="submit-btn" style="margin-top: 2rem; background: linear-gradient(45deg, var(--neon-cyan), #0080ff);">
                     🔄 NOVO QUIZ
                 </button>
             </div>
@@ -702,7 +701,7 @@
                     <div class="form-group">
                         <label for="admin-password">SENHA DE ACESSO:</label>
                         <input type="password" id="admin-password" placeholder="Digite a senha de admin">
-                        <button type="button" onclick="adminLogin()" class="submit-btn" style="width: auto; margin: 1rem 0 0 0; padding: 10px 20px;">ACESSAR SISTEMA</button>
+                        <button type="button" class="submit-btn" style="width: auto; margin: 1rem 0 0 0; padding: 10px 20px;">ACESSAR SISTEMA</button>
                     </div>
                 </div>
 
@@ -710,8 +709,8 @@
                     <div style="background: var(--darker-bg); border: 1px solid var(--neon-red); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
                         <h3 style="margin-bottom: 1rem; color: var(--neon-red); text-transform: uppercase;">CONTROLE DE QUIZ - TEMPO REAL</h3>
                         <div style="margin-bottom: 1rem;">
-                            <button type="button" onclick="adminResetQuiz()" style="background: linear-gradient(45deg, #ff4000, #ff0000); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s ease; margin: 0.5rem 0.5rem 0 0;">REINICIAR QUIZ</button>
-                            <button type="button" onclick="refreshAdminData()" style="background: linear-gradient(45deg, #0080ff, #0040ff); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s ease; margin: 0.5rem 0.5rem 0 0;">ATUALIZAR DADOS</button>
+                            <button type="button" style="background: linear-gradient(45deg, #ff4000, #ff0000); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s ease; margin: 0.5rem 0.5rem 0 0;">REINICIAR QUIZ</button>
+                            <button type="button" style="background: linear-gradient(45deg, #0080ff, #0040ff); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.3s ease; margin: 0.5rem 0.5rem 0 0;">ATUALIZAR DADOS</button>
                         </div>
                     </div>
 
@@ -743,6 +742,8 @@
         </div>
     </div>
 
+    <!-- Socket.IO Script -->
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         // Base de dados das perguntas sobre FATEC
         const questions = [
@@ -902,7 +903,12 @@
             updateTerminalStatus('Conectando ao servidor...');
             
             try {
-                socket = io({
+                // Detecta se está em produção ou local
+                const serverUrl = window.location.hostname.includes("onrender.com")
+                    ? window.location.origin
+                    : "http://localhost:3000";
+                
+                socket = io(serverUrl, {
                     timeout: 10000,
                     forceNew: true,
                     reconnection: true,
@@ -1032,48 +1038,55 @@
             }
         }
 
-        // Seleção de equipe
+        // Seleção de equipe e respostas
         document.addEventListener('click', function(e) {
             if (e.target.closest('.team-option')) {
-                const option = e.target.closest('.team-option');
-                
-                if (!isConnected) {
-                    showNotification('❌ CONECTE-SE AO SERVIDOR PRIMEIRO!', 'error');
-                    return;
-                }
-                
-                document.querySelectorAll('.team-option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                
-                option.classList.add('selected');
-                selectedTeam = option.dataset.team;
-                selectedTeamId = option.dataset.id;
-                
-                document.getElementById('start-quiz-btn').disabled = false;
-                
-                debugLog(`Squad selecionada: ${selectedTeam}`);
-                showNotification('✅ SQUAD SELECIONADA!', 'success');
-                
-                if (navigator.vibrate) {
-                    navigator.vibrate(50);
-                }
+                handleTeamSelection(e.target.closest('.team-option'));
             }
 
-            // Seleção de resposta
             if (e.target.closest('.option') && currentScreen === "quiz-gameplay") {
-                const option = e.target.closest('.option');
-                
-                document.querySelectorAll('.option').forEach(opt => {
-                    opt.classList.remove('selected');
-                });
-                
-                option.classList.add('selected');
-                selectedAnswer = option.dataset.value;
-                
-                debugLog(`Resposta selecionada: ${selectedAnswer}`);
+                handleAnswerSelection(e.target.closest('.option'));
             }
         });
+
+        function handleTeamSelection(option) {
+            if (!isConnected) {
+                showNotification('❌ CONECTE-SE AO SERVIDOR PRIMEIRO!', 'error');
+                return;
+            }
+            
+            document.querySelectorAll('.team-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            option.classList.add('selected');
+            selectedTeam = option.dataset.team;
+            selectedTeamId = option.dataset.id;
+            
+            document.getElementById('start-quiz-btn').disabled = false;
+            
+            debugLog(`Squad selecionada: ${selectedTeam}`);
+            showNotification('✅ SQUAD SELECIONADA!', 'success');
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        function handleAnswerSelection(option) {
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            option.classList.add('selected');
+            selectedAnswer = option.dataset.value;
+            
+            debugLog(`Resposta selecionada: ${selectedAnswer}`);
+        }
+
+        // Event listeners
+        document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+        document.getElementById('student-form').addEventListener('submit', handleFormSubmit);
 
         function startQuiz() {
             if (!selectedTeam || !isConnected) {
@@ -1096,8 +1109,7 @@
             showNotification('🚀 QUIZ INICIADO! BOA SORTE!', 'info');
         }
 
-        // Envio da resposta
-        document.getElementById('student-form').addEventListener('submit', function(e) {
+        function handleFormSubmit(e) {
             e.preventDefault();
             
             if (!selectedAnswer) {
@@ -1131,12 +1143,12 @@
             submitBtn.textContent = 'ENVIANDO...';
             
             setTimeout(() => {
-                submitBtn.textContent = 'TRANSMITIR RESPOSTA';
-                if (!submitBtn.disabled) {
+                if (submitBtn.disabled) {
+                    submitBtn.textContent = 'TRANSMITIR RESPOSTA';
                     submitBtn.disabled = false;
                 }
-            }, 2000);
-        });
+            }, 5000);
+        }
 
         function finishQuiz() {
             debugLog('Finalizando quiz');
@@ -1295,7 +1307,6 @@
         function updateAdminData(data) {
             if (data.stats) {
                 document.getElementById('total-responses').textContent = data.stats.totalResponses || 0;
-                document.getElementById('teams-responded').textContent = data.stats.uniqueTeams || 0;
                 document.getElementById('quiz-progress').textContent = `${data.stats.progressPercentage || 0}%`;
             }
 
@@ -1357,6 +1368,22 @@
             return colors[teamId] || '#ff0040';
         }
 
+        // Event listeners para admin (usando delegação de eventos para evitar erros)
+        document.addEventListener('click', function(e) {
+            if (e.target.textContent === 'ACESSAR SISTEMA') {
+                adminLogin();
+            }
+            if (e.target.textContent === 'REINICIAR QUIZ') {
+                adminResetQuiz();
+            }
+            if (e.target.textContent === 'ATUALIZAR DADOS') {
+                refreshAdminData();
+            }
+            if (e.target.textContent === '🔄 NOVO QUIZ') {
+                resetToStart();
+            }
+        });
+
         function adminResetQuiz() {
             if (!isConnected) {
                 showNotification('❌ SEM CONEXÃO COM SERVIDOR!', 'error');
@@ -1384,37 +1411,13 @@
         // Tratamento de erros globais
         window.addEventListener('error', (e) => {
             debugLog(`Erro JS: ${e.message}`);
-            showNotification('⚠️ ERRO DETECTADO! VERIFIQUE O CONSOLE!', 'error');
+            console.error('Erro capturado:', e);
         });
 
         window.addEventListener('unhandledrejection', (e) => {
             debugLog(`Promise rejeitada: ${e.reason}`);
-            showNotification('⚠️ ERRO DE PROMESSA! VERIFIQUE O CONSOLE!', 'error');
+            console.error('Promise rejeitada:', e.reason);
         });
     </script>
-
-<script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
-<script>
-    // Detecta se está em produção (Render) ou local
-    const SERVER_URL = window.location.hostname.includes("onrender.com")
-        ? "https://quiz-fatec.onrender.com"
-        : "http://localhost:3000";
-
-    // Conecta ao servidor Socket.IO
-    const socket = io(SERVER_URL, {
-        transports: ["websocket"], // Força uso de WebSocket
-        reconnectionAttempts: 5,   // Tenta reconectar até 5 vezes
-        reconnectionDelay: 1000    // Espera 1s entre tentativas
-    });
-
-    socket.on("connect", () => {
-        console.log("✅ Conectado ao servidor!", socket.id);
-    });
-
-    socket.on("connect_error", (err) => {
-        console.error("❌ Erro de conexão:", err.message);
-    });
-</script>
-
 </body>
 </html>
