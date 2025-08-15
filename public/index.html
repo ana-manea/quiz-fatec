@@ -868,6 +868,8 @@
             </div>
         </div>
     </div>
+    
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
 
     <script>
         // Base de dados das perguntas sobre FATEC
@@ -890,7 +892,7 @@
                     "Os internos têm apenas desktops, e os externos apenas notebooks",
                     "Os externos não permitem notebooks pessoais"
                 ],
-                correct: "D"
+                correct: "A"
             },
             {
                 question: "A biblioteca da FATEC atende qual público e qual é um de seus objetivos?",
@@ -920,7 +922,7 @@
                     "Apenas para projetos de tecnologia",
                     "É preciso ser do curso de ADS"
                 ],
-                correct: "B"
+                correct: "A"
             },
             {
                 question: "Qual é a forma correta de solicitar a carteirinha de estudante da FATEC?",
@@ -973,8 +975,9 @@
                 correct: "B"
             }
         ];
-
+        
         // Variáveis do sistema
+        let socket = null;  
         let currentQuestionIndex = 0;
         let selectedTeam = "";
         let selectedTeamId = "";
@@ -988,10 +991,107 @@
         // Inicialização do sistema
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Inicializando Quiz FATEC...');
+
+            // Conectar ao socket
+            initializeSocket();
             
             // Event listeners para botões
             setupEventListeners();
             
+            // LINHA 750: ADICIONAR TODA ESTA FUNÇÃO
+            function initializeSocket() {
+                try {
+                    // Conectar ao Socket.IO
+                    socket = io();
+                    
+                    socket.on('connect', () => {
+                        console.log('Conectado ao servidor Socket.IO');
+                        isConnected = true;
+                        updateConnectionStatus();
+                        updateTerminalStatus('Sistema online... Aguardando participantes...');
+                        showNotification('🟢 CONECTADO AO SERVIDOR!', 'success');
+                    });
+            
+                    socket.on('disconnect', () => {
+                        console.log('Desconectado do servidor');
+                        isConnected = false;
+                        updateConnectionStatus();
+                        updateTerminalStatus('Conexão perdida... Tentando reconectar...');
+                        showNotification('🔴 CONEXÃO PERDIDA!', 'error');
+                    });
+            
+                    socket.on('connect_error', (error) => {
+                        console.error('Erro de conexão:', error);
+                        isConnected = false;
+                        updateConnectionStatus();
+                        updateTerminalStatus('Erro de conexão... Modo offline ativado...');
+                        showNotification('⚠️ ERRO DE CONEXÃO - MODO OFFLINE!', 'error');
+                        
+                        setTimeout(() => {
+                            isConnected = true;
+                            updateConnectionStatus();
+                            updateTerminalStatus('Modo offline ativo...');
+                            showNotification('📴 MODO OFFLINE ATIVADO!', 'info');
+                        }, 3000);
+                    });
+            
+                    socket.on('answer-received', (data) => {
+                        if (data.success) {
+                            console.log('Resposta confirmada pelo servidor');
+                            showNotification(data.message, 'success');
+                        } else {
+                            console.error('Erro no servidor:', data.message);
+                            showNotification(data.message, 'error');
+                        }
+                    });
+            
+                    socket.on('admin-authenticated', (data) => {
+                        console.log('Admin autenticado com sucesso');
+                        isAdmin = true;
+                        responses = data.responses || [];
+                        document.getElementById('admin-login').style.display = 'none';
+                        document.getElementById('admin-content').style.display = 'block';
+                        updateAdminData(data.stats);
+                        showNotification('✅ ACESSO ADMIN LIBERADO!', 'success');
+                    });
+            
+                    socket.on('admin-error', (message) => {
+                        console.error('Erro de admin:', message);
+                        showNotification('❌ ' + message.toUpperCase(), 'error');
+                        document.getElementById('admin-password').value = '';
+                    });
+            
+                    socket.on('admin-update', (data) => {
+                        if (isAdmin) {
+                            responses = data.responses || [];
+                            updateAdminData(data.stats);
+                        }
+                    });
+            
+                    socket.on('quiz-reset', () => {
+                        console.log('Quiz resetado pelo admin');
+                        responses = [];
+                        if (!isAdmin) {
+                            resetToStart();
+                        }
+                        showNotification('🔄 QUIZ RESETADO PELO ADMIN!', 'info');
+                    });
+            
+                    socket.on('quiz-completed', (data) => {
+                        console.log('Quiz finalizado:', data);
+                        showNotification(`🎉 ${data.totalCorrect}/${data.totalQuestions} CORRETAS!`, 'success');
+                    });
+            
+                } catch (error) {
+                    console.error('Erro ao inicializar Socket.IO:', error);
+                    setTimeout(() => {
+                        isConnected = true;
+                        updateConnectionStatus();
+                        updateTerminalStatus('Modo offline ativo...');
+                        showNotification('📴 INICIANDO EM MODO OFFLINE!', 'info');
+                    }, 1000);
+                }
+            }
             // Simular conexão para demonstração
             setTimeout(() => {
                 isConnected = true;
@@ -1116,12 +1216,12 @@
                 showNotification('⚠️ SELECIONE UMA RESPOSTA!', 'error');
                 return;
             }
-
+        
             if (!isConnected) {
                 showNotification('❌ SEM CONEXÃO COM SERVIDOR!', 'error');
                 return;
             }
-
+        
             const currentQuestion = questions[currentQuestionIndex];
             const isCorrect = selectedAnswer === currentQuestion.correct;
             
@@ -1135,11 +1235,23 @@
                 isCorrect: isCorrect,
                 timestamp: new Date().toLocaleTimeString('pt-BR')
             };
-
-            // Adicionar à lista de respostas
-            responses.push(responseData);
-
+        
+            // 🆕 NOVA SEÇÃO: Enviar resposta via Socket.IO
+            if (socket && socket.connected) {
+                console.log('Enviando resposta via Socket.IO:', responseData);
+                socket.emit('submit-answer', responseData);
+            } else {
+                console.log('Socket desconectado, salvando resposta localmente');
+                responses.push(responseData);
+                showNotification('✅ RESPOSTA SALVA LOCALMENTE!', 'success');
+            }
+        
             console.log(`Resposta: ${selectedAnswer} para questão ${currentQuestionIndex + 1} (${isCorrect ? 'Correta' : 'Incorreta'})`);
+            
+            // 🆕 NOVA SEÇÃO: Desabilitar botão temporariamente
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'PROCESSANDO...';
             
             showSuccessMessage();
             
@@ -1289,23 +1401,38 @@
                 showNotification('⚠️ DIGITE A SENHA!', 'error');
                 return;
             }
-            
-            // Simular login (normalmente seria enviado para o servidor)
-            if (password === 'fatec2024') {
-                console.log('Admin autenticado');
+           
+            if (socket && socket.connected) {
+                console.log('Tentando login admin via Socket.IO');
+                socket.emit('admin-login', { password: password });
+            } else {
+                if (password === 'fatec2024') {
+                console.log('Admin autenticado (modo offline)');
                 isAdmin = true;
                 document.getElementById('admin-login').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
                 updateAdminData();
-                showNotification('✅ ACESSO ADMIN LIBERADO!', 'success');
+                showNotification('✅ ACESSO ADMIN LIBERADO (OFFLINE)!', 'success');
             } else {
                 showNotification('❌ SENHA INCORRETA!', 'error');
                 document.getElementById('admin-password').value = '';
             }
         }
 
-        function updateAdminData() {
+        function updateAdminData(serverStats = null) {
             console.log('Atualizando dados do admin');
+
+            let stats;
+            if (serverStats) {
+                stats = serverStats;
+            } else {
+                stats = {
+                    totalResponses: responses.length,
+                    uniqueTeams: [...new Set(responses.map(r => r.team))].length,
+                    progressPercentage: responses.length > 0 ? 
+                        Math.round((responses.length / (6 * questions.length)) * 100) : 0
+                };
+            }
             
             // Calcular estatísticas
             const stats = {
@@ -1439,20 +1566,31 @@
         function adminResetQuiz() {
             if (confirm('Tem certeza que deseja reiniciar o quiz? Todos os dados serão perdidos!')) {
                 console.log('Admin resetando quiz');
-                responses = [];
                 
-                // Reset all users (simulação)
-                resetToStart();
-                updateAdminData();
-                
-                showNotification('🔄 QUIZ REINICIADO!', 'info');
+                // 🆕 NOVA SEÇÃO: Usar Socket.IO
+                if (socket && socket.connected) {
+                    const password = document.getElementById('admin-password').value || 'fatec2024';
+                    socket.emit('admin-reset', { password: password });
+                } else {
+                    responses = [];
+                    resetToStart();
+                    updateAdminData();
+                    showNotification('🔄 QUIZ REINICIADO (OFFLINE)!', 'info');
+                }
             }
         }
 
         function refreshAdminData() {
             console.log('Atualizando dados admin');
-            updateAdminData();
-            showNotification('🔄 DADOS ATUALIZADOS!', 'info');
+            
+            // 🆕 NOVA SEÇÃO: Usar Socket.IO
+            if (socket && socket.connected) {
+                const password = document.getElementById('admin-password').value || 'fatec2024';
+                socket.emit('admin-refresh', { password: password });
+            } else {
+                updateAdminData();
+                showNotification('🔄 DADOS ATUALIZADOS (OFFLINE)!', 'info');
+            }
         }
 
         // Tratamento de erros globais
