@@ -14,7 +14,6 @@ const io = socketIo(server, {
     }
 });
 
-// Configurações de segurança
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -22,16 +21,22 @@ app.use(helmet({
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             scriptSrc: ["'self'", "'unsafe-inline'"],
-            connectSrc: ["'self'", "ws:", "wss:", "ws://localhost:*", "wss://localhost:*"]
+            connectSrc: [
+                "'self'",
+                "ws:",
+                "wss:",
+                "ws://localhost:*",
+                "wss://localhost:*",
+                "wss://quiz-fatec.onrender.com"
+            ]
         }
     }
 }));
 
 app.use(cors());
 app.use(express.json());
-
-// Servir arquivos estáticos da pasta public
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Dados em memória
 let responses = [];
