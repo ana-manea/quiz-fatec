@@ -318,8 +318,7 @@ server.listen(port, host, () => {
     console.log('='.repeat(50));
     console.log(`📡 Servidor rodando em: http://${host}:${port}`);
     console.log(`📊 Health check: http://${host}:${port}/health`);
-    console.log(`📝 Total de perguntas: ${questions.length}`);
-    console.log(`🔐 Senha admin: ${ADMIN_PASSWORD}`);
+    console.log(`🔐 Senha admin: fatec2024`);
     console.log('='.repeat(50));
     console.log('✅ Sistema pronto para receber conexões!');
     console.log('');
