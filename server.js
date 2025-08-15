@@ -14,7 +14,7 @@ const io = socketIo(server, {
     }
 });
 
-// Configurações
+// Configurações de segurança
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -22,20 +22,22 @@ app.use(helmet({
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             scriptSrc: ["'self'", "'unsafe-inline'"],
-            connectSrc: ["'self'", "ws:", "wss:"]
+            connectSrc: ["'self'", "ws:", "wss:", "ws://localhost:*", "wss://localhost:*"]
         }
     }
 }));
 
 app.use(cors());
 app.use(express.json());
+
+// Servir arquivos estáticos da pasta public
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Dados em memória
 let responses = [];
 const ADMIN_PASSWORD = 'fatec2024';
 
-// Perguntas
+// Perguntas do quiz
 const questions = [
     {
         question: "O que significa a sigla FATEC?",
@@ -129,7 +131,16 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// API admin
+// Health check
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        timestamp: new Date().toISOString(),
+        connections: io.engine.clientsCount 
+    });
+});
+
+// API admin para obter respostas
 app.post('/api/admin/responses', (req, res) => {
     const { password } = req.body;
     if (password !== ADMIN_PASSWORD) {
@@ -150,43 +161,63 @@ app.post('/api/admin/responses', (req, res) => {
     });
 });
 
-// Socket.IO
+// Socket.IO conexões
 io.on('connection', (socket) => {
-    console.log('Cliente conectado:', socket.id);
+    console.log(`[${new Date().toLocaleTimeString()}] Cliente conectado: ${socket.id}`);
 
-    socket.on('submit-answer', (data) => {
-        const response = {
-            id: Date.now(),
-            team: data.team,
-            teamId: data.teamId,
-            question: data.question,
-            questionIndex: data.questionIndex,
-            answer: data.answer,
-            correctAnswer: data.correctAnswer,
-            isCorrect: data.answer === data.correctAnswer,
-            timestamp: new Date().toLocaleTimeString('pt-BR')
-        };
-
-        responses.push(response);
-
-        socket.emit('answer-received', {
-            success: true,
-            message: `✅ Resposta recebida!`
-        });
-
-        // Atualizar admin
-        const stats = {
-            totalResponses: responses.length,
-            uniqueTeams: [...new Set(responses.map(r => r.team))].length,
-            progressPercentage: Math.min(Math.round((responses.length / (6 * questions.length)) * 100), 100)
-        };
-
-        io.emit('admin-update', {
-            responses: responses,
-            stats: stats
-        });
+    // Enviar status do quiz para novos clientes
+    socket.emit('quiz-status', {
+        totalQuestions: questions.length,
+        totalResponses: responses.length
     });
 
+    // Receber resposta do quiz
+    socket.on('submit-answer', (data) => {
+        try {
+            const response = {
+                id: Date.now(),
+                socketId: socket.id,
+                team: data.team,
+                teamId: data.teamId,
+                question: data.question,
+                questionIndex: data.questionIndex,
+                answer: data.answer,
+                correctAnswer: data.correctAnswer,
+                isCorrect: data.answer === data.correctAnswer,
+                timestamp: new Date().toLocaleTimeString('pt-BR')
+            };
+
+            responses.push(response);
+            console.log(`[${response.timestamp}] Resposta recebida de ${response.team}: ${response.answer} (${response.isCorrect ? 'Correto' : 'Incorreto'})`);
+
+            // Confirmar recebimento
+            socket.emit('answer-received', {
+                success: true,
+                message: `✅ Resposta recebida!`
+            });
+
+            // Atualizar todos os admins conectados
+            const stats = {
+                totalResponses: responses.length,
+                uniqueTeams: [...new Set(responses.map(r => r.team))].length,
+                progressPercentage: Math.min(Math.round((responses.length / (6 * questions.length)) * 100), 100)
+            };
+
+            io.emit('admin-update', {
+                responses: responses,
+                stats: stats
+            });
+
+        } catch (error) {
+            console.error('Erro ao processar resposta:', error);
+            socket.emit('answer-received', {
+                success: false,
+                message: `❌ Erro ao processar resposta`
+            });
+        }
+    });
+
+    // Login do admin
     socket.on('admin-login', (data) => {
         if (data.password === ADMIN_PASSWORD) {
             const stats = {
@@ -199,29 +230,42 @@ io.on('connection', (socket) => {
                 responses: responses,
                 stats: stats
             });
+            
+            console.log(`[${new Date().toLocaleTimeString()}] Admin autenticado: ${socket.id}`);
         } else {
             socket.emit('admin-error', 'Senha incorreta');
+            console.log(`[${new Date().toLocaleTimeString()}] Tentativa de login admin falhada: ${socket.id}`);
         }
     });
 
+    // Finalizar quiz
     socket.on('finish-quiz', (data) => {
-        const teamResponses = responses.filter(r => r.team === data.team);
-        const correctAnswers = teamResponses.filter(r => r.isCorrect).length;
-        
-        socket.emit('quiz-completed', {
-            totalCorrect: correctAnswers,
-            totalQuestions: questions.length,
-            percentage: Math.round((correctAnswers / questions.length) * 100)
-        });
+        try {
+            const teamResponses = responses.filter(r => r.team === data.team);
+            const correctAnswers = teamResponses.filter(r => r.isCorrect).length;
+            
+            socket.emit('quiz-completed', {
+                totalCorrect: correctAnswers,
+                totalQuestions: questions.length,
+                percentage: Math.round((correctAnswers / questions.length) * 100)
+            });
+            
+            console.log(`[${new Date().toLocaleTimeString()}] Quiz finalizado por ${data.team}: ${correctAnswers}/${questions.length}`);
+        } catch (error) {
+            console.error('Erro ao finalizar quiz:', error);
+        }
     });
 
+    // Reset do quiz (admin)
     socket.on('admin-reset', (data) => {
         if (data.password === ADMIN_PASSWORD) {
             responses = [];
             io.emit('quiz-reset');
+            console.log(`[${new Date().toLocaleTimeString()}] Quiz resetado pelo admin: ${socket.id}`);
         }
     });
 
+    // Refresh dos dados do admin
     socket.on('admin-refresh', (data) => {
         if (data.password === ADMIN_PASSWORD) {
             const stats = {
@@ -237,13 +281,58 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Desconexão
     socket.on('disconnect', () => {
-        console.log('Cliente desconectado:', socket.id);
+        console.log(`[${new Date().toLocaleTimeString()}] Cliente desconectado: ${socket.id}`);
     });
+
+    // Tratamento de erros
+    socket.on('error', (error) => {
+        console.error(`[${new Date().toLocaleTimeString()}] Erro no socket ${socket.id}:`, error);
+    });
+});
+
+// Tratamento de erros do servidor
+process.on('uncaughtException', (error) => {
+    console.error('Erro não capturado:', error);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Promise rejeitada não tratada:', reason);
+    process.exit(1);
 });
 
 // Iniciar servidor
 const port = process.env.PORT || 3000;
-app.listen(port, '0.0.0.0', () => {
-  console.log(`Server running on port ${port}`);
+const host = process.env.HOST || '0.0.0.0';
+
+server.listen(port, host, () => {
+    console.log('='.repeat(50));
+    console.log('🚀 CYBERQUIZ FATEC - SERVIDOR INICIADO');
+    console.log('='.repeat(50));
+    console.log(`📡 Servidor rodando em: http://${host}:${port}`);
+    console.log(`📊 Health check: http://${host}:${port}/health`);
+    console.log(`📝 Total de perguntas: ${questions.length}`);
+    console.log(`🔐 Senha admin: ${ADMIN_PASSWORD}`);
+    console.log('='.repeat(50));
+    console.log('✅ Sistema pronto para receber conexões!');
+    console.log('');
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('Recebido SIGTERM, fechando servidor graciosamente...');
+    server.close(() => {
+        console.log('Servidor fechado.');
+        process.exit(0);
+    });
+});
+
+process.on('SIGINT', () => {
+    console.log('Recebido SIGINT, fechando servidor graciosamente...');
+    server.close(() => {
+        console.log('Servidor fechado.');
+        process.exit(0);
+    });
 });
