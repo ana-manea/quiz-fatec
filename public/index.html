@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberQuiz FATEC - Multiplayer</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-red: #ff0040;
+            --neon-red-glow: rgba(255, 0, 64, 0.5);
+            --neon-pink: #ff0080;
+            --neon-cyan: #00ffff;
+            --neon-green: #00ff80;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --card-bg: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            --border-glow: rgba(255, 0, 64, 0.3);
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--dark-bg);
+            background-image: 
+                radial-gradient(circle at 25% 25%, var(--neon-red-glow) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 0, 128, 0.3) 0%, transparent 50%),
+                linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: var(--card-bg);
+            border: 2px solid var(--neon-red);
+            border-radius: 20px;
+            box-shadow: 
+                0 0 30px var(--neon-red-glow),
+                inset 0 0 30px rgba(255, 0, 64, 0.1);
+            padding: 2rem;
+            width: 90%;
+            max-width: 900px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            animation: containerGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes containerGlow {
+            from {
+                box-shadow: 0 0 30px var(--neon-red-glow), inset 0 0 30px rgba(255, 0, 64, 0.1);
+            }
+            to {
+                box-shadow: 0 0 50px var(--neon-red-glow), inset 0 0 50px rgba(255, 0, 64, 0.15);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--neon-red);
+            text-shadow: 
+                0 0 10px var(--neon-red),
+                0 0 20px var(--neon-red),
+                0 0 30px var(--neon-red);
+            margin-bottom: 0.5rem;
+            animation: logoFlicker 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            z-index: 1000;
+        }
+
+        .connection-status.connected {
+            background: rgba(0, 255, 128, 0.2);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .connection-status.disconnected {
+            background: rgba(255, 64, 64, 0.2);
+            border: 1px solid #ff4040;
+            color: #ff4040;
+        }
+
+        .progress-container {
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .progress-bar-outer {
+            height: 8px;
+            background: var(--darker-bg);
+            border-radius: 4px;
+            border: 1px solid var(--neon-red);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-red), var(--neon-pink));
+            border-radius: 3px;
+            width: 0%;
+            transition: width 1s ease-out;
+            box-shadow: 0 0 10px var(--neon-red-glow);
+        }
+
+        .view-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .view-btn {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 12px 24px;
+            border: 2px solid var(--neon-red);
+            background: transparent;
+            color: var(--neon-red);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .view-btn.active {
+            background: var(--neon-red);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-red-glow);
+            transform: translateY(-2px);
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--neon-red);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.9rem;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .team-option {
+            padding: 15px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background: var(--darker-bg);
+        }
+
+        .team-option.team-1 { border-color: #ff0040; color: #ff0040; }
+        .team-option.team-2 { border-color: #ff4000; color: #ff4000; }
+        .team-option.team-3 { border-color: #ff8000; color: #ff8000; }
+        .team-option.team-4 { border-color: #ffff00; color: #ffff00; }
+        .team-option.team-5 { border-color: #8000ff; color: #8000ff; }
+        .team-option.team-6 { border-color: #ff0080; color: #ff0080; }
+
+        .team-option:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 0, 64, 0.3);
+        }
+
+        .team-option.selected {
+            border-color: currentColor;
+            background: rgba(255, 0, 64, 0.1);
+            box-shadow: 
+                0 0 20px currentColor,
+                inset 0 0 20px rgba(255, 0, 64, 0.1);
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .current-question {
+            background: var(--darker-bg);
+            border: 1px solid var(--neon-red);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-number {
+            color: var(--neon-red);
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .options-container {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .option {
+            background: var(--darker-bg);
+            border: 2px solid rgba(255, 0, 64, 0.3);
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option:hover {
+            border-color: var(--neon-red);
+            background: rgba(255, 0, 64, 0.05);
+            transform: translateX(3px);
+        }
+
+        .option.selected {
+            border-color: var(--neon-red);
+            background: rgba(255, 0, 64, 0.15);
+            box-shadow: 0 0 15px var(--neon-red-glow);
+            color: var(--neon-red);
+            font-weight: 600;
+        }
+
+        .option-letter {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: var(--neon-red);
+            color: var(--dark-bg);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: 700;
+            margin-right: 12px;
+            font-size: 0.8rem;
+        }
+
+        .submit-btn {
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(45deg, var(--neon-red), var(--neon-pink));
+            color: var(--text-primary);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px var(--neon-red-glow);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .success-message {
+            background: linear-gradient(45deg, rgba(0, 255, 0, 0.2), rgba(0, 255, 128, 0.2));
+            border: 2px solid #00ff80;
+            color: #00ff80;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            margin-top: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            animation: successPulse 0.6s ease;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(0.9); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .admin-panel input, .admin-panel textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(255, 0, 64, 0.5);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--darker-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .admin-panel input:focus, .admin-panel textarea:focus {
+            outline: none;
+            border-color: var(--neon-red);
+            box-shadow: 0 0 15px var(--neon-red-glow);
+        }
+
+        .password-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--darker-bg);
+            border: 1px solid var(--neon-red);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--neon-red);
+            text-shadow: 0 0 10px var(--neon-red-glow);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .responses-container {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .response-card {
+            background: var(--darker-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .response-card.team-1 { border-left-color: #ff0040; }
+        .response-card.team-2 { border-left-color: #ff4000; }
+        .response-card.team-3 { border-left-color: #ff8000; }
+        .response-card.team-4 { border-left-color: #ffff00; }
+        .response-card.team-5 { border-left-color: #8000ff; }
+        .response-card.team-6 { border-left-color: #ff0080; }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .team-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--neon-red);
+            text-transform: uppercase;
+        }
+
+        .timestamp {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .question-management {
+            background: var(--darker-bg);
+            border: 1px solid var(--neon-red);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .clear-btn, .next-question-btn {
+            background: linear-gradient(45deg, #ff4000, #ff0000);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            margin: 0.5rem 0.5rem 0 0;
+        }
+
+        .next-question-btn {
+            background: linear-gradient(45deg, #00ff80, #008040);
+        }
+
+        .clear-btn:hover, .next-question-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 64, 0, 0.4);
+        }
+
+        .terminal-text {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--neon-red);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-screen {
+            display: none;
+        }
+
+        .quiz-screen.active {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .team-selection-screen {
+            text-align: center;
+        }
+
+        .welcome-message {
+            color: var(--neon-cyan);
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .final-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            color: var(--neon-green);
+            text-shadow: 0 0 20px var(--neon-green);
+            margin-bottom: 1rem;
+            animation: finalGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes finalGlow {
+            from { text-shadow: 0 0 20px var(--neon-green); }
+            to { text-shadow: 0 0 30px var(--neon-green), 0 0 40px var(--neon-green); }
+        }
+
+        .final-message {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .team-badge {
+            background: linear-gradient(45deg, var(--neon-red), var(--neon-pink));
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            box-shadow: 0 0 20px var(--neon-red-glow);
+        }
+
+        .completion-stats {
+            background: var(--darker-bg);
+            border: 2px solid var(--neon-green);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            color: var(--neon-green);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease;
+            max-width: 300px;
+        }
+
+        .notification.success {
+            background: var(--card-bg);
+            border: 2px solid #00ff80;
+            color: #00ff80;
+        }
+
+        .notification.error {
+            background: var(--card-bg);
+            border: 2px solid #ff4040;
+            color: #ff4040;
+        }
+
+        .notification.info {
+            background: var(--card-bg);
+            border: 2px solid #00ffff;
+            color: #00ffff;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .view-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .final-title {
+                font-size: 2rem;
+            }
+
+            .connection-status {
+                position: static;
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="connection-status" id="connection-status">
+        🔌 CONECTANDO...
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo">CYBERQUIZ FATEC</div>
+            <div class="subtitle">SISTEMA MULTIPLAYER - TEMPO REAL</div>
+            <div class="terminal-text">> Sistema online... Aguardando participantes...</div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-label">
+                <span>PROGRESSO</span>
+                <span id="progress-text">0 / 10 MISSÕES</span>
+            </div>
+            <div class="progress-bar-outer">
+                <div class="progress-bar-inner" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="view-selector">
+            <button class="view-btn active" onclick="showView('student')">ÁREA ESTUDANTE</button>
+            <button class="view-btn" onclick="showView('admin')">ÁREA ADMIN</button>
+        </div>
+
+        <!-- Área do Estudante -->
+        <div id="student-view" class="view active">
+            <!-- Tela de Seleção de Equipe -->
+            <div id="team-selection" class="quiz-screen team-selection-screen active">
+                <div class="welcome-message">
+                    <div style="font-size: 1.5rem; color: var(--neon-red); margin-bottom: 1rem;">
+                        🚀 BEM-VINDO AO CYBERQUIZ MULTIPLAYER!
+                    </div>
+                    <div>
+                        Prepare-se para uma jornada de 10 missões sobre a FATEC.<br>
+                        Suas respostas serão sincronizadas em tempo real!<br>
+                        Primeiro, selecione sua SQUAD para começar a aventura!
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="team">SELECIONE SUA SQUAD:</label>
+                    <div class="team-grid">
+                        <div class="team-option team-1" data-team="Squad Alpha" data-id="team-1">⚡ SQUAD ALPHA</div>
+                        <div class="team-option team-2" data-team="Squad Beta" data-id="team-2">🔥 SQUAD BETA</div>
+                        <div class="team-option team-3" data-team="Squad Gamma" data-id="team-3">⭐ SQUAD GAMMA</div>
+                        <div class="team-option team-4" data-team="Squad Delta" data-id="team-4">💎 SQUAD DELTA</div>
+                        <div class="team-option team-5" data-team="Squad Epsilon" data-id="team-5">🚀 SQUAD EPSILON</div>
+                        <div class="team-option team-6" data-team="Squad Zeta" data-id="team-6">⚡ SQUAD ZETA</div>
+                    </div>
+                </div>
+
+                <button type="button" class="submit-btn" id="start-quiz-btn" onclick="startQuiz()" disabled>
+                    🎯 INICIAR MISSÕES
+                </button>
+            </div>
+
+            <!-- Tela do Quiz -->
+            <div id="quiz-gameplay" class="quiz-screen">
+                <form id="student-form">
+                    <div class="form-group">
+                        <div id="current-question-display" class="current-question">
+                            <div class="question-number" id="question-number">MISSÃO 1 DE 10</div>
+                            <div id="question-text">Aguardando conexão com o servidor...</div>
+                            <div class="options-container" id="options-container">
+                                <!-- Options will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submit-btn">TRANSMITIR RESPOSTA</button>
+                </form>
+
+                <div id="success-message" style="display: none;" class="success-message">
+                    ✅ RESPOSTA TRANSMITIDA COM SUCESSO!
+                </div>
+            </div>
+
+            <!-- Tela Final -->
+            <div id="final-screen" class="quiz-screen final-screen">
+                <div class="final-title">🏆 MISSÃO COMPLETA!</div>
+                
+                <div class="final-message">
+                    Parabéns! Você concluiu todas as 10 missões do CyberQuiz FATEC com sucesso!
+                </div>
+
+                <div class="team-badge" id="final-team-name">
+                    SQUAD ALPHA
+                </div>
+
+                <div class="completion-stats">
+                    <div style="font-size: 1.5rem; margin-bottom: 1rem;">
+                        📊 ESTATÍSTICAS FINAIS
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                        <div>
+                            <div style="font-size: 2rem; font-weight: bold;" id="final-correct">0/10</div>
+                            <div style="font-size: 0.9rem;">Missões Corretas</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2rem; font-weight: bold;" id="final-percentage">0%</div>
+                            <div style="font-size: 0.9rem;">Aproveitamento</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 2rem; font-weight: bold;" id="final-timestamp">--:--</div>
+                            <div style="font-size: 0.9rem;">Finalizado em</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="color: var(--text-muted); font-size: 1rem; margin-top: 2rem;">
+                    🎉 Obrigado por participar do CyberQuiz FATEC!<br>
+                    Suas respostas foram sincronizadas com o servidor.
+                </div>
+
+                <button type="button" class="submit-btn" onclick="resetToStart()" style="margin-top: 2rem; background: linear-gradient(45deg, var(--neon-cyan), #0080ff);">
+                    🔄 NOVO QUIZ
+                </button>
+            </div>
+        </div>
+
+        <!-- Área do Administrador -->
+        <div id="admin-view" class="view">
+            <div class="admin-panel">
+                <div class="password-section" id="admin-login">
+                    <div class="terminal-text">> Acesso restrito. Credenciais necessárias.</div>
+                    <div class="form-group">
+                        <label for="admin-password">SENHA DE ACESSO:</label>
+                        <input type="password" id="admin-password" placeholder="Digite a senha de admin">
+                        <button type="button" onclick="adminLogin()" class="submit-btn" style="width: auto; margin: 1rem 0 0 0; padding: 10px 20px;">ACESSAR SISTEMA</button>
+                    </div>
+                </div>
+
+                <div id="admin-content" style="display: none;">
+                    <div class="question-management">
+                        <h3 style="margin-bottom: 1rem; color: var(--neon-red); text-transform: uppercase;">CONTROLE DE QUIZ - TEMPO REAL</h3>
+                        <div style="margin-bottom: 1rem;">
+                            <button type="button" onclick="adminResetQuiz()" class="clear-btn">REINICIAR QUIZ</button>
+                            <button type="button" onclick="generateFinalReport()" class="next-question-btn">RELATÓRIO FINAL</button>
+                            <button type="button" onclick="refreshAdminData()" class="next-question-btn" style="background: linear-gradient(45deg, #0080ff, #0040ff);">ATUALIZAR DADOS</button>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-responses">0</div>
+                            <div class="stat-label">Respostas Totais</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="teams-responded">0</div>
+                            <div class="stat-label">Squads Participantes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="quiz-progress">0%</div>
+                            <div class="stat-label">Taxa de Conclusão</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="color: var(--neon-red); text-transform: uppercase;">RESULTADOS EM TEMPO REAL</h3>
+                        <div style="color: var(--neon-green); font-size: 0.9rem;" id="last-update">
+                            🟢 Dados sincronizados
+                        </div>
+                    </div>
+                    
+                    <div id="responses-container" class="responses-container">
+                        <div style="text-align: center; color: var(--text-muted); padding: 2rem; font-family: 'JetBrains Mono', monospace;">
+                            > Sistema aguardando participantes...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base de dados das perguntas sobre FATEC
+        const questions = [
+            {
+                question: "O que significa a sigla FATEC?",
+                options: [
+                    "Faculdade de Tecnologia Empresarial e Científica",
+                    "Faculdade de Tecnologia do Estado de São Paulo",
+                    "Fundação de Apoio à Tecnologia e Ciência",
+                    "Faculdade de Tecnologia e Computação"
+                ],
+                correct: "B"
+            },
+            {
+                question: "Em que ano foi criada a primeira FATEC?",
+                options: [
+                    "1968",
+                    "1969",
+                    "1970",
+                    "1971"
+                ],
+                correct: "C"
+            },
+            {
+                question: "Qual é o órgão responsável pela administração das FATECs?",
+                options: [
+                    "USP - Universidade de São Paulo",
+                    "UNICAMP - Universidade Estadual de Campinas",
+                    "CEETEPS - Centro Estadual de Educação Tecnológica Paula Souza",
+                    "UNESP - Universidade Estadual Paulista"
+                ],
+                correct: "C"
+            },
+            {
+                question: "Qual foi a primeira FATEC criada no Estado de São Paulo?",
+                options: [
+                    "FATEC São Paulo",
+                    "FATEC Campinas",
+                    "FATEC Santos",
+                    "FATEC São Bernardo do Campo"
+                ],
+                correct: "A"
+            },
+            {
+                question: "Qual é a duração típica dos cursos de graduação tecnológica nas FATECs?",
+                options: [
+                    "2 anos",
+                    "3 anos",
+                    "4 anos",
+                    "5 anos"
+                ],
+                correct: "B"
+            },
+            {
+                question: "As FATECs são instituições de ensino:",
+                options: [
+                    "Privadas com fins lucrativos",
+                    "Privadas sem fins lucrativos",
+                    "Públicas estaduais",
+                    "Públicas federais"
+                ],
+                correct: "C"
+            },
+            {
+                question: "Qual é o principal foco dos cursos oferecidos pelas FATECs?",
+                options: [
+                    "Formação acadêmica teórica",
+                    "Formação tecnológica aplicada ao mercado de trabalho",
+                    "Pesquisa científica avançada",
+                    "Extensão universitária"
+                ],
+                correct: "B"
+            },
+            {
+                question: "O vestibular das FATECs é realizado quantas vezes por ano?",
+                options: [
+                    "1 vez por ano",
+                    "2 vezes por ano",
+                    "3 vezes por ano",
+                    "4 vezes por ano"
+                ],
+                correct: "B"
+            },
+            {
+                question: "Qual das seguintes áreas NÃO é tradicionalmente oferecida pelas FATECs?",
+                options: [
+                    "Tecnologia da Informação",
+                    "Gestão e Negócios",
+                    "Medicina",
+                    "Produção Industrial"
+                ],
+                correct: "C"
+            },
+            {
+                question: "O diploma de um curso superior de tecnologia da FATEC tem o mesmo valor legal de:",
+                options: [
+                    "Curso técnico",
+                    "Curso de bacharelado",
+                    "Curso de especialização",
+                    "Curso de extensão"
+                ],
+                correct: "B"
+            }
+        ];
+
+        // Variáveis do sistema
+        let socket;
+        let currentQuestionIndex = 0;
+        let selectedTeam = "";
+        let selectedTeamId = "";
+        let selectedAnswer = "";
+        let quizStartTime = null;
+        let currentScreen = "team-selection";
+        let isConnected = false;
+        let isAdmin = false;
+
+        // Inicialização do sistema
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSocket();
+            updateProgressBar();
+            
+            // Permitir Enter no campo de senha
+            const passwordField = document.getElementById('admin-password');
+            if (passwordField) {
+                passwordField.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        adminLogin();
+                    }
+                });
+            }
+        });
+
+        // Inicializar Socket.IO
+        function initializeSocket() {
+            socket = io();
+
+            socket.on('connect', () => {
+                isConnected = true;
+                updateConnectionStatus();
+                showNotification('🟢 CONECTADO AO SERVIDOR!', 'success');
+            });
+
+            socket.on('disconnect', () => {
+                isConnected = false;
+                updateConnectionStatus();
+                showNotification('🔴 CONEXÃO PERDIDA!', 'error');
+            });
+
+            socket.on('quiz-status', (data) => {
+                // Atualizar status do quiz
+                updateProgressBar();
+            });
+
+            socket.on('answer-received', (data) => {
+                if (data.success) {
+                    showSuccessMessage();
+                    showNotification(data.message, 'success');
+                    
+                    setTimeout(() => {
+                        if (currentQuestionIndex < questions.length - 1) {
+                            currentQuestionIndex++;
+                            updateQuestionDisplay();
+                            resetQuestionSelection();
+                            showNotification('🔢 PRÓXIMA MISSÃO ATIVADA!', 'info');
+                        } else {
+                            finishQuiz();
+                        }
+                    }, 2000);
+                } else {
+                    showNotification('❌ ERRO AO ENVIAR RESPOSTA!', 'error');
+                }
+            });
+
+            socket.on('quiz-completed', (data) => {
+                updateFinalScreenStats(data);
+            });
+
+            socket.on('quiz-reset', () => {
+                if (!isAdmin) {
+                    resetToStart();
+                    showNotification('🔄 QUIZ REINICIADO PELO ADMIN!', 'info');
+                }
+            });
+
+            // Events do admin
+            socket.on('admin-authenticated', (data) => {
+                isAdmin = true;
+                document.getElementById('admin-login').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                updateAdminData(data);
+                showNotification('✅ ACESSO ADMIN LIBERADO!', 'success');
+            });
+
+            socket.on('admin-error', (message) => {
+                showNotification('❌ ' + message.toUpperCase(), 'error');
+                document.getElementById('admin-password').value = '';
+            });
+
+            socket.on('admin-update', (data) => {
+                if (isAdmin) {
+                    updateAdminData(data);
+                }
+            });
+
+            socket.on('error', (message) => {
+                showNotification('⚠️ ' + message.toUpperCase(), 'error');
+            });
+        }
+
+        function updateConnectionStatus() {
+            const statusEl = document.getElementById('connection-status');
+            if (isConnected) {
+                statusEl.textContent = '🟢 CONECTADO';
+                statusEl.className = 'connection-status connected';
+            } else {
+                statusEl.textContent = '🔴 DESCONECTADO';
+                statusEl.className = 'connection-status disconnected';
+            }
+        }
+
+        // Seleção de equipe
+        document.querySelectorAll('.team-option').forEach(option => {
+            option.addEventListener('click', function() {
+                if (!isConnected) {
+                    showNotification('❌ CONECTE-SE AO SERVIDOR PRIMEIRO!', 'error');
+                    return;
+                }
+                
+                document.querySelectorAll('.team-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                this.classList.add('selected');
+                selectedTeam = this.dataset.team;
+                selectedTeamId = this.dataset.id;
+                
+                document.getElementById('start-quiz-btn').disabled = false;
+                
+                showNotification('✅ SQUAD SELECIONADA!', 'success');
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            });
+        });
+
+        function startQuiz() {
+            if (!selectedTeam || !isConnected) {
+                showNotification('⚠️ SELECIONE UMA SQUAD E CONECTE-SE!', 'error');
+                return;
+            }
+            
+            quizStartTime = new Date();
+            currentScreen = "quiz-gameplay";
+            
+            document.getElementById('team-selection').classList.remove('active');
+            document.getElementById('quiz-gameplay').classList.add('active');
+            
+            currentQuestionIndex = 0;
+            updateQuestionDisplay();
+            
+            showNotification('🚀 QUIZ INICIADO! BOA SORTE!', 'info');
+        }
+
+        // Seleção de resposta
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.option') && currentScreen === "quiz-gameplay") {
+                const option = e.target.closest('.option');
+                
+                document.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                option.classList.add('selected');
+                selectedAnswer = option.dataset.value;
+            }
+        });
+
+        // Envio da resposta
+        document.getElementById('student-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!selectedAnswer) {
+                showNotification('⚠️ SELECIONE UMA RESPOSTA!', 'error');
+                return;
+            }
+
+            if (!isConnected) {
+                showNotification('❌ SEM CONEXÃO COM SERVIDOR!', 'error');
+                return;
+            }
+
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            const responseData = {
+                team: selectedTeam,
+                teamId: selectedTeamId,
+                question: currentQuestion.question,
+                questionIndex: currentQuestionIndex,
+                answer: selectedAnswer,
+                correctAnswer: currentQuestion.correct
+            };
+
+            socket.emit('submit-answer', responseData);
+
+            // Animação de envio
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                submitBtn.style.transform = '';
+                submitBtn.disabled = false;
+            }, 2000);
+        });
+
+        function finishQuiz() {
+            currentScreen = "final-screen";
+            
+            document.getElementById('progress-bar').style.width = '100%';
+            document.getElementById('progress-text').textContent = `${questions.length} / ${questions.length} MISSÕES`;
+            
+            document.getElementById('quiz-gameplay').classList.remove('active');
+            document.getElementById('final-screen').classList.add('active');
+            
+            document.getElementById('final-team-name').textContent = selectedTeam;
+            document.getElementById('final-timestamp').textContent = new Date().toLocaleTimeString('pt-BR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Solicitar dados finais do servidor
+            socket.emit('finish-quiz', { team: selectedTeam });
+            
+            showNotification('🎉 PARABÉNS! QUIZ FINALIZADO!', 'success');
+        }
+
+        function updateFinalScreenStats(data) {
+            document.getElementById('final-correct').textContent = `${data.totalCorrect}/${data.totalQuestions}`;
+            document.getElementById('final-percentage').textContent = `${data.percentage}%`;
+        }
+
+        function resetToStart() {
+            currentQuestionIndex = 0;
+            selectedAnswer = "";
+            selectedTeam = "";
+            selectedTeamId = "";
+            quizStartTime = null;
+            currentScreen = "team-selection";
+            
+            document.querySelectorAll('.team-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            document.querySelectorAll('.quiz-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            document.getElementById('team-selection').classList.add('active');
+            document.getElementById('start-quiz-btn').disabled = true;
+            
+            updateProgressBar();
+            
+            showNotification('🔄 SISTEMA REINICIADO!', 'info');
+        }
+
+        function resetQuestionSelection() {
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            selectedAnswer = "";
+        }
+
+        function showNotification(message, type = 'info') {
+            // Remove notificações existentes
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(n => n.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+
+        function showSuccessMessage() {
+            const successMsg = document.getElementById('success-message');
+            successMsg.style.display = 'block';
+            
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 3000);
+        }
+
+        function updateQuestionDisplay() {
+            const currentQuestion = questions[currentQuestionIndex];
+            const questionNumber = currentQuestionIndex + 1;
+            
+            document.getElementById('question-number').textContent = `MISSÃO ${questionNumber} DE ${questions.length}`;
+            document.getElementById('question-text').textContent = currentQuestion.question;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            currentQuestion.options.forEach((option, index) => {
+                const letter = String.fromCharCode(65 + index);
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.dataset.value = letter;
+                optionDiv.innerHTML = `
+                    <span class="option-letter">${letter}</span>
+                    ${option}
+                `;
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            const progress = (currentQuestionIndex / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = `${currentQuestionIndex} / ${questions.length} MISSÕES`;
+        }
+
+        function showView(viewName) {
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(viewName + '-view').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Funções do Admin
+        function adminLogin() {
+            const password = document.getElementById('admin-password').value;
+            socket.emit('admin-login', { password: password });
+        }
+
+        function updateAdminData(data) {
+            if (data.stats) {
+                document.getElementById('total-responses').textContent = data.stats.totalResponses || 0;
+                document.getElementById('teams-responded').textContent = data.stats.uniqueTeams || 0;
+                document.getElementById('quiz-progress').textContent = `${data.stats.progressPercentage || 0}%`;
+            }
+
+            if (data.responses) {
+                updateAdminResponses(data.responses);
+            }
+
+            document.getElementById('last-update').textContent = '🟢 ' + new Date().toLocaleTimeString();
+        }
+
+        function updateAdminResponses(responses) {
+            const container = document.getElementById('responses-container');
+            
+            if (!responses || responses.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); padding: 2rem; font-family: 'JetBrains Mono', monospace;">
+                        > Sistema aguardando participantes...
+                    </div>
+                `;
+                return;
+            }
+
+            const recentResponses = responses.slice(-10).reverse();
+
+            container.innerHTML = recentResponses.map(response => {
+                const teamClass = response.teamId;
+                const correctIcon = response.isCorrect ? '✅' : '❌';
+                const statusColor = response.isCorrect ? '#00ff80' : '#ff4040';
+                
+                return `
+                    <div class="response-card ${teamClass}">
+                        <div class="response-header">
+                            <span class="team-name">${response.team}</span>
+                            <span class="timestamp">${response.timestamp}</span>
+                        </div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>Missão ${response.questionIndex + 1}:</strong> ${response.question}
+                        </div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>Resposta:</strong> <span style="color: ${statusColor};">${response.answer} ${correctIcon}</span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">
+                            Resposta correta: ${response.correctAnswer}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function generateFinalReport() {
+            // Fazer requisição para obter dados completos
+            fetch('/api/admin/responses', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    password: 'fatec2024'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.responses) {
+                    const report = generateReportText(data.responses);
+                    downloadReport(report);
+                    showNotification('📊 RELATÓRIO GERADO!', 'success');
+                }
+            })
+            .catch(error => {
+                showNotification('❌ ERRO AO GERAR RELATÓRIO!', 'error');
+            });
+        }
+
+        function generateReportText(responses) {
+            const report = [];
+            report.push('='.repeat(60));
+            report.push('          RELATÓRIO FINAL - CYBERQUIZ FATEC');
+            report.push('='.repeat(60));
+            report.push(`Data: ${new Date().toLocaleDateString('pt-BR')}`);
+            report.push(`Hora: ${new Date().toLocaleTimeString('pt-BR')}`);
+            report.push('');
+            
+            // Estatísticas gerais
+            const totalResponses = responses.length;
+            const uniqueTeams = [...new Set(responses.map(r => r.team))];
+            const correctAnswers = responses.filter(r => r.isCorrect).length;
+            
+            report.push('ESTATÍSTICAS GERAIS:');
+            report.push('-'.repeat(30));
+            report.push(`Total de respostas: ${totalResponses}`);
+            report.push(`Squads participantes: ${uniqueTeams.length}`);
+            report.push(`Respostas corretas: ${correctAnswers} (${Math.round((correctAnswers/totalResponses)*100)}%)`);
+            report.push('');
+            
+            // Resultados por squad
+            report.push('RESULTADOS POR SQUAD:');
+            report.push('-'.repeat(30));
+            
+            uniqueTeams.forEach(team => {
+                const teamResponses = responses.filter(r => r.team === team);
+                const teamCorrect = teamResponses.filter(r => r.isCorrect).length;
+                const teamPercentage = Math.round((teamCorrect / teamResponses.length) * 100);
+                
+                report.push(`${team}:`);
+                report.push(`  Respostas: ${teamResponses.length}`);
+                report.push(`  Corretas: ${teamCorrect} (${teamPercentage}%)`);
+                report.push('');
+            });
+            
+            return report.join('\n');
+        }
+
+        function downloadReport(content) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `cyberquiz-fatec-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function adminResetQuiz() {
+            if (confirm('Tem certeza que deseja reiniciar o quiz? Todos os dados serão perdidos!')) {
+                socket.emit('admin-reset', { password: 'fatec2024' });
+                showNotification('🔄 QUIZ REINICIADO!', 'info');
+            }
+        }
+
+        function refreshAdminData() {
+            socket.emit('admin-refresh', { password: 'fatec2024' });
+            showNotification('🔄 DADOS ATUALIZADOS!', 'info');
+        }
+    </script>
+</body>
+</html>

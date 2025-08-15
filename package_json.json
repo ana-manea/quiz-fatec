@@ -1,0 +1,28 @@
+{
+  "name": "cyberquiz-fatec",
+  "version": "1.0.0",
+  "description": "Quiz interativo sobre FATEC com sistema multiplayer em tempo real",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "helmet": "^7.0.0",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "quiz",
+    "fatec",
+    "multiplayer",
+    "real-time",
+    "education"
+  ],
+  "author": "FATEC",
+  "license": "MIT"
+}
