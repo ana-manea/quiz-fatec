@@ -66,6 +66,32 @@
             }
         }
 
+        .connection-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .connection-indicator.connected {
+            background: linear-gradient(90deg, var(--neon-green), #00cc66);
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .connection-indicator.disconnected {
+            background: linear-gradient(90deg, #ff4040, #cc0000);
+            box-shadow: 0 0 10px #ff4040;
+            animation: disconnectedPulse 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes disconnectedPulse {
+            from { opacity: 0.7; }
+            to { opacity: 1; }
+        }
+
         .header {
             text-align: center;
             margin-bottom: 2rem;
@@ -96,31 +122,6 @@
             font-weight: 400;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-        }
-
-        .connection-status {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            z-index: 1000;
-        }
-
-        .connection-status.connected {
-            background: rgba(0, 255, 128, 0.2);
-            border: 1px solid var(--neon-green);
-            color: var(--neon-green);
-        }
-
-        .connection-status.disconnected {
-            background: rgba(255, 64, 64, 0.2);
-            border: 1px solid #ff4040;
-            color: #ff4040;
         }
 
         .progress-container {
@@ -497,20 +498,6 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        .debug-panel {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--darker-bg);
-            border: 1px solid var(--neon-red);
-            border-radius: 8px;
-            padding: 10px;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            max-width: 300px;
-            z-index: 999;
-        }
-
         .admin-panel input {
             width: 100%;
             padding: 12px 16px;
@@ -585,6 +572,91 @@
             transition: transform 0.3s ease;
         }
 
+        .team-scores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .team-score-card {
+            background: var(--card-bg);
+            border: 2px solid;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .team-score-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .team-score-card.team-1 { border-color: #ff0040; }
+        .team-score-card.team-2 { border-color: #ff4000; }
+        .team-score-card.team-3 { border-color: #ff8000; }
+        .team-score-card.team-4 { border-color: #ffff00; }
+        .team-score-card.team-5 { border-color: #8000ff; }
+        .team-score-card.team-6 { border-color: #ff0080; }
+
+        .team-score-name {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .team-score-name.team-1 { color: #ff0040; }
+        .team-score-name.team-2 { color: #ff4000; }
+        .team-score-name.team-3 { color: #ff8000; }
+        .team-score-name.team-4 { color: #ffff00; }
+        .team-score-name.team-5 { color: #8000ff; }
+        .team-score-name.team-6 { color: #ff0080; }
+
+        .team-score-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .team-score-total {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .team-score-progress {
+            margin-top: 1rem;
+            height: 6px;
+            background: var(--darker-bg);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .team-score-progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+
+        .team-score-progress-bar.team-1 { background: linear-gradient(90deg, #ff0040, #ff4080); }
+        .team-score-progress-bar.team-2 { background: linear-gradient(90deg, #ff4000, #ff8040); }
+        .team-score-progress-bar.team-3 { background: linear-gradient(90deg, #ff8000, #ffb040); }
+        .team-score-progress-bar.team-4 { background: linear-gradient(90deg, #ffff00, #ffff80); }
+        .team-score-progress-bar.team-5 { background: linear-gradient(90deg, #8000ff, #b040ff); }
+        .team-score-progress-bar.team-6 { background: linear-gradient(90deg, #ff0080, #ff40b0); }
+
         @media (max-width: 768px) {
             .container {
                 margin: 1rem;
@@ -608,35 +680,23 @@
                 font-size: 2rem;
             }
 
-            .connection-status {
-                position: static;
-                margin-bottom: 1rem;
-                text-align: center;
-            }
-
-            .debug-panel {
-                position: static;
-                margin-top: 1rem;
-            }
-
             .admin-stats-grid {
                 grid-template-columns: 1fr;
             }
+
+            .team-scores-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Esconder o debug panel */
+        .debug-panel {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="connection-status" id="connection-status">
-        🔌 CONECTANDO...
-    </div>
-
-    <!-- Debug Panel -->
-    <div class="debug-panel" id="debug-panel">
-        <strong>DEBUG:</strong><br>
-        Socket: <span id="socket-status">Desconectado</span><br>
-        Estado: <span id="current-state">Inicial</span><br>
-        Time: <span id="debug-time">--:--</span>
-    </div>
+    <div class="connection-indicator" id="connection-indicator"></div>
 
     <div class="container">
         <div class="header">
@@ -709,7 +769,7 @@
                 </form>
 
                 <div id="success-message" style="display: none;" class="success-message">
-                    ✅ RESPOSTA TRANSMITIDA COM SUCESSO!
+                    ✅ RESPOSTA REGISTRADA!
                 </div>
             </div>
 
@@ -718,7 +778,8 @@
                 <div class="final-title">🏆 MISSÃO COMPLETA!</div>
                 
                 <div class="final-message">
-                    Parabéns! Você concluiu todas as 10 missões do CyberQuiz FATEC com sucesso!
+                    Parabéns! Você concluiu todas as 10 missões do CyberQuiz FATEC com sucesso!<br>
+                    Suas respostas foram transmitidas e registradas no sistema.
                 </div>
 
                 <div class="team-badge" id="final-team-name">
@@ -727,16 +788,12 @@
 
                 <div class="completion-stats">
                     <div style="font-size: 1.5rem; margin-bottom: 1rem;">
-                        📊 ESTATÍSTICAS FINAIS
+                        📊 MISSÃO FINALIZADA
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
                         <div>
-                            <div style="font-size: 2rem; font-weight: bold;" id="final-correct">0/10</div>
-                            <div style="font-size: 0.9rem;">Missões Corretas</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 2rem; font-weight: bold;" id="final-percentage">0%</div>
-                            <div style="font-size: 0.9rem;">Aproveitamento</div>
+                            <div style="font-size: 2rem; font-weight: bold;">10/10</div>
+                            <div style="font-size: 0.9rem;">Missões Completadas</div>
                         </div>
                         <div>
                             <div style="font-size: 2rem; font-weight: bold;" id="final-timestamp">--:--</div>
@@ -789,6 +846,16 @@
                         <div class="admin-stat-card">
                             <div class="admin-stat-value" id="admin-quiz-progress">0%</div>
                             <div class="admin-stat-label">Taxa de Conclusão</div>
+                        </div>
+                    </div>
+
+                    <!-- Seção de Pontuação por Equipe -->
+                    <div style="background: var(--darker-bg); border: 1px solid var(--neon-green); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1rem; color: var(--neon-green); text-transform: uppercase;">🏆 PONTUAÇÃO POR SQUAD</h3>
+                        <div id="team-scores-container" class="team-scores-grid">
+                            <div style="text-align: center; color: var(--text-muted); padding: 1rem; font-family: 'JetBrains Mono', monospace;">
+                                > Aguardando participação das squads...
+                            </div>
                         </div>
                     </div>
 
@@ -927,24 +994,9 @@
         let isConnected = false;
         let isAdmin = false;
 
-        // Debug functions
-        function updateDebugPanel() {
-            const now = new Date();
-            document.getElementById('debug-time').textContent = now.toLocaleTimeString('pt-BR');
-            document.getElementById('socket-status').textContent = isConnected ? 'Conectado' : 'Desconectado';
-            document.getElementById('current-state').textContent = currentScreen;
-        }
-
-        function debugLog(message) {
-            console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
-            updateDebugPanel();
-        }
-
         // Inicialização do sistema
         document.addEventListener('DOMContentLoaded', function() {
-            debugLog('Inicializando CyberQuiz FATEC...');
-            updateDebugPanel();
-            setInterval(updateDebugPanel, 1000);
+            console.log('Inicializando CyberQuiz FATEC...');
             
             // Event listeners para botões
             setupEventListeners();
@@ -997,7 +1049,7 @@
 
         // Inicializar Socket.IO
         function initializeSocket() {
-            debugLog('Tentando conectar ao servidor...');
+            console.log('Tentando conectar ao servidor...');
             updateTerminalStatus('Conectando ao servidor...');
             
             try {
@@ -1006,7 +1058,7 @@
                     ? window.location.origin
                     : "http://localhost:3000";
                 
-                debugLog(`Conectando em: ${serverUrl}`);
+                console.log(`Conectando em: ${serverUrl}`);
                 
                 socket = io(serverUrl, {
                     timeout: 10000,
@@ -1020,7 +1072,7 @@
                 setupSocketEvents();
 
             } catch (error) {
-                debugLog(`Erro fatal na inicialização: ${error.message}`);
+                console.error(`Erro fatal na inicialização: ${error.message}`);
                 updateTerminalStatus('Erro fatal... Recarregue a página...');
                 showNotification('💀 ERRO FATAL! RECARREGUE A PÁGINA!', 'error');
             }
@@ -1028,7 +1080,7 @@
 
         function setupSocketEvents() {
             socket.on('connect', () => {
-                debugLog('Conectado ao servidor!');
+                console.log('Conectado ao servidor!');
                 isConnected = true;
                 updateConnectionStatus();
                 updateTerminalStatus('Sistema online... Aguardando participantes...');
@@ -1036,7 +1088,7 @@
             });
 
             socket.on('disconnect', (reason) => {
-                debugLog(`Desconectado: ${reason}`);
+                console.log(`Desconectado: ${reason}`);
                 isConnected = false;
                 updateConnectionStatus();
                 updateTerminalStatus('Conexão perdida... Tentando reconectar...');
@@ -1044,7 +1096,7 @@
             });
 
             socket.on('connect_error', (error) => {
-                debugLog(`Erro de conexão: ${error.message}`);
+                console.log(`Erro de conexão: ${error.message}`);
                 isConnected = false;
                 updateConnectionStatus();
                 updateTerminalStatus('Erro de conexão... Verifique se o servidor está rodando...');
@@ -1052,43 +1104,41 @@
             });
 
             socket.on('reconnect', (attemptNumber) => {
-                debugLog(`Reconectado após ${attemptNumber} tentativa(s)`);
+                console.log(`Reconectado após ${attemptNumber} tentativa(s)`);
                 showNotification('🟢 RECONECTADO!', 'success');
             });
 
             socket.on('quiz-status', (data) => {
-                debugLog(`Status do quiz recebido: ${data.totalResponses} respostas`);
+                console.log(`Status do quiz recebido: ${data.totalResponses} respostas`);
                 updateProgressBar();
             });
 
             socket.on('answer-received', (data) => {
-                debugLog(`Resposta confirmada: ${data.success}`);
+                console.log(`Resposta confirmada: ${data.success}`);
                 if (data.success) {
                     showSuccessMessage();
-                    showNotification(data.message, 'success');
                     
                     setTimeout(() => {
                         if (currentQuestionIndex < questions.length - 1) {
                             currentQuestionIndex++;
                             updateQuestionDisplay();
                             resetQuestionSelection();
-                            showNotification('📢 PRÓXIMA MISSÃO ATIVADA!', 'info');
                         } else {
                             finishQuiz();
                         }
-                    }, 2000);
+                    }, 1500);
                 } else {
                     showNotification('❌ ERRO AO ENVIAR RESPOSTA!', 'error');
                 }
             });
 
             socket.on('quiz-completed', (data) => {
-                debugLog(`Quiz concluído: ${data.percentage}%`);
-                updateFinalScreenStats(data);
+                console.log(`Quiz concluído: ${data.percentage}%`);
+                // Não mostramos mais as estatísticas de acertos para o aluno
             });
 
             socket.on('quiz-reset', () => {
-                debugLog('Quiz resetado pelo admin');
+                console.log('Quiz resetado pelo admin');
                 if (!isAdmin) {
                     resetToStart();
                     showNotification('🔄 QUIZ REINICIADO PELO ADMIN!', 'info');
@@ -1097,7 +1147,7 @@
 
             // Events do admin
             socket.on('admin-authenticated', (data) => {
-                debugLog('Admin autenticado com sucesso');
+                console.log('Admin autenticado com sucesso');
                 isAdmin = true;
                 document.getElementById('admin-login').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
@@ -1106,20 +1156,20 @@
             });
 
             socket.on('admin-error', (message) => {
-                debugLog(`Erro admin: ${message}`);
+                console.log(`Erro admin: ${message}`);
                 showNotification('❌ ' + message.toUpperCase(), 'error');
                 document.getElementById('admin-password').value = '';
             });
 
             socket.on('admin-update', (data) => {
                 if (isAdmin) {
-                    debugLog('Dados admin atualizados');
+                    console.log('Dados admin atualizados');
                     updateAdminData(data);
                 }
             });
 
             socket.on('error', (message) => {
-                debugLog(`Erro: ${message}`);
+                console.log(`Erro: ${message}`);
                 showNotification('⚠️ ' + message.toUpperCase(), 'error');
             });
         }
@@ -1132,13 +1182,11 @@
         }
 
         function updateConnectionStatus() {
-            const statusEl = document.getElementById('connection-status');
+            const statusEl = document.getElementById('connection-indicator');
             if (isConnected) {
-                statusEl.textContent = '🟢 CONECTADO';
-                statusEl.className = 'connection-status connected';
+                statusEl.className = 'connection-indicator connected';
             } else {
-                statusEl.textContent = '🔴 DESCONECTADO';
-                statusEl.className = 'connection-status disconnected';
+                statusEl.className = 'connection-indicator disconnected';
             }
         }
 
@@ -1158,7 +1206,7 @@
             
             document.getElementById('start-quiz-btn').disabled = false;
             
-            debugLog(`Squad selecionada: ${selectedTeam}`);
+            console.log(`Squad selecionada: ${selectedTeam}`);
             showNotification('✅ SQUAD SELECIONADA!', 'success');
             
             if (navigator.vibrate) {
@@ -1174,7 +1222,7 @@
             option.classList.add('selected');
             selectedAnswer = option.dataset.value;
             
-            debugLog(`Resposta selecionada: ${selectedAnswer}`);
+            console.log(`Resposta selecionada: ${selectedAnswer}`);
         }
 
         function startQuiz() {
@@ -1183,7 +1231,7 @@
                 return;
             }
             
-            debugLog(`Iniciando quiz para ${selectedTeam}`);
+            console.log(`Iniciando quiz para ${selectedTeam}`);
             
             quizStartTime = new Date();
             currentScreen = "quiz-gameplay";
@@ -1222,7 +1270,7 @@
                 correctAnswer: currentQuestion.correct
             };
 
-            debugLog(`Enviando resposta: ${selectedAnswer} para questão ${currentQuestionIndex + 1}`);
+            console.log(`Enviando resposta: ${selectedAnswer} para questão ${currentQuestionIndex + 1}`);
             
             socket.emit('submit-answer', responseData);
 
@@ -1240,7 +1288,7 @@
         }
 
         function finishQuiz() {
-            debugLog('Finalizando quiz');
+            console.log('Finalizando quiz');
             
             currentScreen = "final-screen";
             
@@ -1263,14 +1311,8 @@
             showNotification('🎉 PARABÉNS! QUIZ FINALIZADO!', 'success');
         }
 
-        function updateFinalScreenStats(data) {
-            debugLog(`Stats finais: ${data.totalCorrect}/${data.totalQuestions} (${data.percentage}%)`);
-            document.getElementById('final-correct').textContent = `${data.totalCorrect}/${data.totalQuestions}`;
-            document.getElementById('final-percentage').textContent = `${data.percentage}%`;
-        }
-
         function resetToStart() {
-            debugLog('Resetando para o início');
+            console.log('Resetando para o início');
             
             currentQuestionIndex = 0;
             selectedAnswer = "";
@@ -1328,14 +1370,14 @@
             
             setTimeout(() => {
                 successMsg.style.display = 'none';
-            }, 3000);
+            }, 1500);
         }
 
         function updateQuestionDisplay() {
             const currentQuestion = questions[currentQuestionIndex];
             const questionNumber = currentQuestionIndex + 1;
             
-            debugLog(`Exibindo questão ${questionNumber}: ${currentQuestion.question.substring(0, 50)}...`);
+            console.log(`Exibindo questão ${questionNumber}: ${currentQuestion.question.substring(0, 50)}...`);
             
             document.getElementById('question-number').textContent = `MISSÃO ${questionNumber} DE ${questions.length}`;
             document.getElementById('question-text').textContent = currentQuestion.question;
@@ -1389,12 +1431,12 @@
                 return;
             }
             
-            debugLog('Tentando login admin');
+            console.log('Tentando login admin');
             socket.emit('admin-login', { password: password });
         }
 
         function updateAdminData(data) {
-            debugLog('Atualizando dados do admin');
+            console.log('Atualizando dados do admin');
             
             if (data.stats) {
                 const stats = data.stats;
@@ -1405,9 +1447,81 @@
 
             if (data.responses) {
                 updateAdminResponses(data.responses);
+                updateTeamScores(data.responses);
             }
 
             document.getElementById('admin-last-update').textContent = '🟢 Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
+        }
+
+        function updateTeamScores(responses) {
+            const container = document.getElementById('team-scores-container');
+            
+            if (!responses || responses.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); padding: 1rem; font-family: 'JetBrains Mono', monospace; grid-column: 1 / -1;">
+                        > Aguardando participação das squads...
+                    </div>
+                `;
+                return;
+            }
+
+            // Calcular pontuações por equipe
+            const teamScores = {};
+            const teamNames = {
+                'team-1': 'Squad Alpha',
+                'team-2': 'Squad Beta', 
+                'team-3': 'Squad Gamma',
+                'team-4': 'Squad Delta',
+                'team-5': 'Squad Epsilon',
+                'team-6': 'Squad Zeta'
+            };
+
+            responses.forEach(response => {
+                const teamId = response.teamId || 'team-1';
+                const teamName = response.team;
+                
+                if (!teamScores[teamId]) {
+                    teamScores[teamId] = {
+                        name: teamName,
+                        correct: 0,
+                        total: 0
+                    };
+                }
+                
+                teamScores[teamId].total++;
+                if (response.isCorrect) {
+                    teamScores[teamId].correct++;
+                }
+            });
+
+            // Criar cards de pontuação
+            const scoreCards = Object.keys(teamScores)
+                .sort((a, b) => teamScores[b].correct - teamScores[a].correct) // Ordenar por pontuação
+                .map(teamId => {
+                    const score = teamScores[teamId];
+                    const percentage = score.total > 0 ? (score.correct / score.total * 100) : 0;
+                    const progressWidth = score.total > 0 ? (score.correct / 10 * 100) : 0; // Progress baseado em 10 questões
+                    
+                    return `
+                        <div class="team-score-card ${teamId}">
+                            <div class="team-score-name ${teamId}">${score.name}</div>
+                            <div class="team-score-value">${score.correct}</div>
+                            <div class="team-score-total">de ${Math.min(score.total, 10)} questões</div>
+                            <div class="team-score-progress">
+                                <div class="team-score-progress-bar ${teamId}" style="width: ${Math.min(progressWidth, 100)}%;"></div>
+                            </div>
+                            <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted);">
+                                ${Math.round(percentage)}% de aproveitamento
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            container.innerHTML = scoreCards || `
+                <div style="text-align: center; color: var(--text-muted); padding: 1rem; font-family: 'JetBrains Mono', monospace; grid-column: 1 / -1;">
+                    > Nenhuma squad participou ainda...
+                </div>
+            `;
         }
 
         function updateAdminResponses(responses) {
@@ -1469,7 +1583,7 @@
             }
             
             if (confirm('Tem certeza que deseja reiniciar o quiz? Todos os dados serão perdidos!')) {
-                debugLog('Admin resetando quiz');
+                console.log('Admin resetando quiz');
                 socket.emit('admin-reset', { password: 'fatec2024' });
                 showNotification('🔄 QUIZ REINICIADO!', 'info');
             }
@@ -1481,19 +1595,17 @@
                 return;
             }
             
-            debugLog('Atualizando dados admin');
+            console.log('Atualizando dados admin');
             socket.emit('admin-refresh', { password: 'fatec2024' });
             showNotification('🔄 DADOS ATUALIZADOS!', 'info');
         }
 
         // Tratamento de erros globais
         window.addEventListener('error', (e) => {
-            debugLog(`Erro JS: ${e.message}`);
             console.error('Erro capturado:', e);
         });
 
         window.addEventListener('unhandledrejection', (e) => {
-            debugLog(`Promise rejeitada: ${e.reason}`);
             console.error('Promise rejeitada:', e.reason);
         });
     </script>
