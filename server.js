@@ -20,7 +20,11 @@ app.use(helmet({
             defaultSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: [
+                "'self'",
+                "'unsafe-inline'",       // libera scripts inline (ex: onclick)
+                "https://cdn.socket.io"  // permite carregar o socket.io via CDN
+            ],
             connectSrc: [
                 "'self'",
                 "ws:",
