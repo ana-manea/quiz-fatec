@@ -1,4 +1,4 @@
-# 🚀 CyberQuiz FATEC - Sistema Multiplayer
+# CyberQuiz FATEC
 
 Um quiz interativo em tempo real sobre a FATEC, desenvolvido com Node.js, Socket.IO e design cyberpunk.
 
@@ -6,16 +6,16 @@ Um quiz interativo em tempo real sobre a FATEC, desenvolvido com Node.js, Socket
 ![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
 ![Socket.IO](https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101)
 
-## ✨ Características
+## Características
 
-- 🎮 **Sistema Multiplayer**: Múltiplos jogadores em tempo real
-- ⚡ **Comunicação Instantânea**: Socket.IO para atualizações em tempo real
-- 🎨 **Design Cyberpunk**: Interface moderna com efeitos neon
-- 📊 **Painel Admin**: Monitoramento e controle em tempo real
-- 📱 **Responsivo**: Funciona em desktop e mobile
-- 🔒 **Seguro**: Validação de dados e proteção admin
+- **Sistema Multiplayer**: Múltiplos jogadores em tempo real
+- **Comunicação Instantânea**: Socket.IO para atualizações em tempo real
+- **Design Cyberpunk**: Interface moderna com efeitos neon
+- **Painel Admin**: Monitoramento e controle em tempo real
+- **Responsivo**: Funciona em desktop e mobile
+- **Seguro**: Validação de dados e proteção admin
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **Backend**: Node.js + Express
 - **Real-time**: Socket.IO
@@ -23,9 +23,9 @@ Um quiz interativo em tempo real sobre a FATEC, desenvolvido com Node.js, Socket
 - **Segurança**: Helmet + CORS
 - **Fonts**: Google Fonts (JetBrains Mono + Orbitron)
 
-## 🚀 Deploy Rápido
+## Deploy Rápido
 
-### Render (Recomendado)
+### Render
 
 1. **Conecte seu GitHub** no [Render](https://render.com)
 2. **Crie um Web Service**
@@ -33,56 +33,7 @@ Um quiz interativo em tempo real sobre a FATEC, desenvolvido com Node.js, Socket
    - Build Command: `npm install`
    - Start Command: `npm start`
 
-### Heroku
-
-1. **Clone o repositório**:
-```bash
-git clone <seu-repositorio>
-cd cyberquiz-fatec
-```
-
-2. **Instale as dependências**:
-```bash
-npm install
-```
-
-3. **Deploy no Heroku**:
-```bash
-# Instale o Heroku CLI
-# Faça login: heroku login
-
-# Crie a aplicação
-heroku create cyberquiz-fatec
-
-# Configure as variáveis de ambiente
-heroku config:set NODE_ENV=production
-
-# Deploy
-git add .
-git commit -m "Deploy inicial"
-git push heroku main
-```
-
-## 🏃‍♂️ Executar Localmente
-
-```bash
-# Clone o repositório
-git clone <seu-repositorio>
-cd cyberquiz-fatec
-
-# Instale as dependências
-npm install
-
-# Execute em modo desenvolvimento
-npm run dev
-
-# Ou execute em produção
-npm start
-```
-
-Acesse: `http://localhost:3000`
-
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 cyberquiz-fatec/
@@ -93,7 +44,7 @@ cyberquiz-fatec/
 └── 📄 README.md         # Documentação
 ```
 
-## 🎮 Como Usar
+## Como Usar
 
 ### Para Estudantes:
 1. **Acesse a URL** do sistema
@@ -103,25 +54,25 @@ cyberquiz-fatec/
 
 ### Para Administradores:
 1. **Clique em "ÁREA ADMIN"**
-2. **Digite a senha**: `fatec2024`
+2. **Digite a senha**: 
 3. **Monitore respostas** em tempo real
 4. **Gere relatórios** completos
 5. **Reinicie o quiz** quando necessário
 
-## 🎯 Funcionalidades
+## Funcionalidades
 
-### 👥 Sistema Multiplayer
+### Sistema Multiplayer
 - 6 squads simultâneas
 - Sincronização em tempo real
 - Histórico de respostas
 
-### 📊 Painel Admin
+### Painel Admin
 - Estatísticas em tempo real
 - Monitor de respostas
 - Relatórios detalhados
 - Controle de reinicialização
 
-### 🎨 Interface
+### Interface
 - Design cyberpunk responsivo
 - Animações e efeitos visuais
 - Notificações em tempo real
@@ -164,22 +115,22 @@ POST /api/admin/responses  # Obter respostas (admin)
 - `admin-authenticated`: Admin autenticado
 - `admin-update`: Atualização admin
 
-## 🛡️ Segurança
+## Segurança
 
-- ✅ Helmet para headers de segurança
-- ✅ CORS configurado
-- ✅ Validação de dados
-- ✅ Senha protegida do admin
+- Helmet para headers de segurança
+- CORS configurado
+- Validação de dados
+- Senha protegida do admin
 
-## 📱 Compatibilidade
+## Compatibilidade
 
-- ✅ Chrome 80+
-- ✅ Firefox 75+
-- ✅ Safari 13+
-- ✅ Edge 80+
-- ✅ Mobile (iOS/Android)
+- Chrome 80+
+- Firefox 75+
+- Safari 13+
+- Edge 80+
+- Mobile (iOS/Android)
 
-## 🤝 Contribuição
+## Contribuição
 
 1. **Fork** o projeto
 2. **Crie** uma branch: `git checkout -b feature/nova-funcionalidade`
@@ -187,20 +138,17 @@ POST /api/admin/responses  # Obter respostas (admin)
 4. **Push** para a branch: `git push origin feature/nova-funcionalidade`
 5. **Abra** um Pull Request
 
-## 📄 Licença
+## Licença
 
 Este projeto está sob a licença MIT.
 
-## 👨‍💻 Autor
+## Autor
 
-Desenvolvido com ❤️ para a comunidade FATEC
+Desenvolvido para a comunidade FATEC
 
 ---
 
-### 🎯 Links Úteis
+### Links Úteis
 
 - [Render Deploy](https://render.com/docs)
 - [Socket.IO Documentation](https://socket.io/docs/)
-- [Heroku Deploy Guide](https://devcenter.heroku.com/articles/deploying-nodejs)
-
-**Senha Admin Padrão**: `fatec2024`
